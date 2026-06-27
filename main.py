@@ -57,16 +57,17 @@ while True:
     {"\n".join([f" - {chunk}" for chunk, similarity in retrieved_knowledge])}
     """
 
-stream = ollama.chat(
-    model=LANGUAGE_MODEL,
-    messages=[
-        {"role": "system", "content": instruction_prompt},
-        {"role": "user", "content": input_query},
-    ],
-    stream=True,
-)
+    stream = ollama.chat(
+        model=LANGUAGE_MODEL,
+        messages=[
+            {"role": "system", "content": instruction_prompt},
+            {"role": "user", "content": input_query},
+        ],
+        stream=True,
+    )
 
-# print the response from the chatbot in real-time
-print("Chatbot response:")
-for chunk in stream:
-    print(chunk["message"]["content"], end="", flush=True)
+    # print the response from the chatbot in real-time
+    print("Chatbot response:")
+    for chunk in stream:
+        print(chunk["message"]["content"], end="", flush=True)
+    print("\n\n")
