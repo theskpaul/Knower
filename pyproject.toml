@@ -1,9 +1,12 @@
 [project]
-name = "knowledge"
-version = "0.1.0"
-description = "Add your description here"
+name = "knower"
+version = "0.1"
+description = "A RAG that can help you study, by letting you get insights for you documents from your local knowledge base"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "ollama>=0.6.2",
+    "langchain>=1.3.11",
+    "langchain-chroma>=1.1.0",
+    "langchain-ollama>=1.1.0",
+    "langchain-text-splitters>=1.1.2",
 ]
