@@ -13,7 +13,7 @@ git clone https://github.com/theskpaul/Knower.git
 ```
 
 2nd, install ollama and uv from your respective package manager if you are using Linux or,
-     Visit [ollama.com](https://ollama.com) for Ollama and [uv.sh](https://uv.sh) for uv.
+     Visit [ollama.com](https://ollama.com) for Ollama and [docs.astral.sh/uv](https://docs.astral.sh/uv) for uv.
 
 3rd, start ollam by:
 
