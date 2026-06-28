@@ -23,7 +23,7 @@ NUM_OF_TOP_CHUNKS: int = 2
 
 def split_dataset() -> list[Document]:
     dataset = ""
-    with open(DATASET, "r") as file:
+    with open(DATASET, "r", encoding="utf-8") as file:
         dataset = file.read()
 
     docs = [
