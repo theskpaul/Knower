@@ -3,10 +3,12 @@ from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
-LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
+# EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
+# LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
+EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
+LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 
-DATASET: str = "./dataset/cat-facts.txt"
+DATASET: str = "./dataset/cat-facts-rewritten.txt"
 PERSISTENT_DIR = "./db"
 
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
