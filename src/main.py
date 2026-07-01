@@ -1,12 +1,13 @@
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from loader import load_dataset as ld
+from text_splitter import TextSplitter as ts
 
 # EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
 # LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
+
 EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
 LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 
@@ -24,40 +25,18 @@ vector_store = Chroma(
 NUM_OF_TOP_CHUNKS: int = 2
 
 
-def split_dataset() -> list[Document]:
-    datasets = ld(DATASET_PATH)
-
-    splits: list[Document] = []
-
-    for data in datasets.contents():
-        docs = [
-            Document(
-                page_content=data["content"],
-                metadata={
-                    "source": data["metadata"]["source"],
-                    "sha256": data["metadata"]["sha256"],
-                },
-            )
-        ]
-
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500, chunk_overlap=100, add_start_index=True
-        )
-        splits += text_splitter.split_documents(docs)
-
-    return splits
-
-
-print(split_dataset())
-
-
 def store_dataset(splits: list[Document]) -> None:
     vector_store.add_documents(splits)
 
 
 def operation(option: str = ("search" or "2")):
+    dataset = ld(DATASET_PATH)
+
+    splitter = ts(500, 20)
+    splits = splitter.split_dataset(dataset.contents())
+
     if option == "1" or option == "load dataset":
-        store_dataset(split_dataset())
+        store_dataset(splits)
     elif option == "2" or option == "search":
         search()
     else:
