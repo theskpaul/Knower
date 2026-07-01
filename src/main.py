@@ -3,12 +3,14 @@ from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from loader import load_dataset as ld
+
 # EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
 # LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
 EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
 LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 
-DATASET: str = "./dataset/cat-facts-rewritten.txt"
+DATASET_PATH: str = "./dataset"
 PERSISTENT_DIR = "./db"
 
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
@@ -23,23 +25,30 @@ NUM_OF_TOP_CHUNKS: int = 2
 
 
 def split_dataset() -> list[Document]:
-    dataset = ""
-    with open(DATASET, "r", encoding="utf-8") as file:
-        dataset = file.read()
+    datasets = ld(DATASET_PATH)
 
-    docs = [
-        Document(
-            page_content=dataset,
-            metadata={"source": DATASET},
+    splits: list[Document] = []
+
+    for data in datasets.contents():
+        docs = [
+            Document(
+                page_content=data["content"],
+                metadata={
+                    "source": data["metadata"]["source"],
+                    "sha256": data["metadata"]["sha256"],
+                },
+            )
+        ]
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500, chunk_overlap=100, add_start_index=True
         )
-    ]
-
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=100, add_start_index=True
-    )
-    splits = text_splitter.split_documents(docs)
+        splits += text_splitter.split_documents(docs)
 
     return splits
+
+
+print(split_dataset())
 
 
 def store_dataset(splits: list[Document]) -> None:
