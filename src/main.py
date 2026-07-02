@@ -1,7 +1,7 @@
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
+from database import VectorStore
 from loader import load_dataset as ld
 from text_splitter import TextSplitter as ts
 
@@ -17,16 +17,12 @@ PERSISTENT_DIR = "./db"
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
 embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
 
-vector_store = Chroma(
-    persist_directory=PERSISTENT_DIR,
-    embedding_function=embedder,
+vector_store = VectorStore(
+    PERSISTENT_DIR,
+    embedder,
 )
 
 NUM_OF_TOP_CHUNKS: int = 2
-
-
-def store_dataset(splits: list[Document]) -> None:
-    vector_store.add_documents(splits)
 
 
 def operation(option: str = ("search" or "2")):
@@ -36,9 +32,11 @@ def operation(option: str = ("search" or "2")):
     splits = splitter.split_dataset(dataset.contents())
 
     if option == "1" or option == "load dataset":
-        store_dataset(splits)
+        vector_store.store(splits)
     elif option == "2" or option == "search":
         search()
+    elif option == "3" or option == "Exit":
+        exit(0)
     else:
         search()
         pass
@@ -46,8 +44,8 @@ def operation(option: str = ("search" or "2")):
 
 def retrieve_content(query: str):
     """Retrieve content from the vector store based on the given query."""
-    retrieved_docs: list[Document] = vector_store.similarity_search(
-        query, k=NUM_OF_TOP_CHUNKS
+    retrieved_docs: list[Document] = vector_store.search(
+        query, number_of_top_results=NUM_OF_TOP_CHUNKS
     )
 
     serialized: str = "\n\n".join(
@@ -77,6 +75,6 @@ def search():
 if __name__ == "__main__":
     while True:
         selection = input(
-            "\n\nWhat would you like to do?\n(1) load dataset\n(2) search - Default\n>> "
+            "\n\nWhat would you like to do?\n(1) load dataset\n(2) search - Default\n(3) Exit\n>> "
         ).lower()
         operation(selection)
