@@ -22,7 +22,7 @@ class load_dataset:
             sha256 = self.generate_sha256(f)
 
             with open(f.path, "r", encoding="utf-8") as file:
-                content = file.read()
+                content = file.read().rstrip()
                 dataset.append(
                     {
                         "metadata": {

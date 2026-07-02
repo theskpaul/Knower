@@ -14,6 +14,16 @@ LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 DATASET_PATH: str = "./dataset"
 PERSISTENT_DIR = "./db"
 
+NUM_OF_TOP_CHUNKS: int = 2
+
+MENU = """
+What would you like to do?
+    (1) load dataset
+    (2) search - Default
+    (3) List Chunks
+    (4) Exit
+>> """
+
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
 embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
 
@@ -22,28 +32,8 @@ vector_store = VectorStore(
     embedder,
 )
 
-NUM_OF_TOP_CHUNKS: int = 2
-
-
-def operation(option: str = ("search" or "2")):
-    dataset = ld(DATASET_PATH)
-
-    splitter = ts(500, 20)
-    splits = splitter.split_dataset(dataset.contents())
-
-    if option == "1" or option == "load dataset":
-        vector_store.store(splits)
-    elif option == "2" or option == "search":
-        search()
-    elif option == "3" or option == "Exit":
-        exit(0)
-    else:
-        search()
-        pass
-
 
 def retrieve_content(query: str):
-    """Retrieve content from the vector store based on the given query."""
     retrieved_docs: list[Document] = vector_store.search(
         query, number_of_top_results=NUM_OF_TOP_CHUNKS
     )
@@ -72,9 +62,35 @@ def search():
     print(llm.invoke(prompt))
 
 
+def operation(option: str = ("search" or "2")):
+    dataset = ld(DATASET_PATH)
+    splitter = ts(dataset.contents())
+
+    if option == "1" or option == "load dataset":
+        splits = splitter.split_dataset(embedder)
+
+        vector_store.store(splits)
+    elif option == "2" or option == "search":
+        search()
+    elif option == "3" or option == "List Chunks":
+        for data in splitter.split_dataset(embedding_function=embedder):
+            print(f"""
+# Chunk_{data.metadata["chunk_count"] + 1}
+metadata:[
+    "source": {data.metadata["source"]},
+    "start_index": {data.metadata["start_index"]},
+    "file_sha256": {data.metadata["file_sha256"]},
+    "chunk_sha256": {data.metadata["chunk_sha256"]}
+],
+Page_content: {data.page_content}""")
+    elif option == "4" or option == "Exit":
+        exit(0)
+    else:
+        search()
+        pass
+
+
 if __name__ == "__main__":
     while True:
-        selection = input(
-            "\n\nWhat would you like to do?\n(1) load dataset\n(2) search - Default\n(3) Exit\n>> "
-        ).lower()
+        selection = input(MENU).lower()
         operation(selection)

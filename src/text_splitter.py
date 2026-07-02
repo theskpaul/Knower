@@ -1,18 +1,20 @@
 import hashlib
 
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
 
 
 class TextSplitter:
-    def __init__(self, chunk_size: int, chunk_overlap: int):
-        self.__chunk_size = chunk_size
-        self.__chunk_overlap = chunk_overlap
+    def __init__(self, datasets: list[dict]):
+        self.datasets = datasets
 
-    def split_dataset(self, datasets: list[dict]) -> list[Document]:
+    def split_dataset(
+        self,
+        embedding_function,
+    ) -> list[Document]:
         splits: list[Document] = []
 
-        for data in datasets:
+        for data in self.datasets:
             docs = [
                 Document(
                     metadata={
@@ -23,13 +25,14 @@ class TextSplitter:
                 )
             ]
 
-            splitter = RecursiveCharacterTextSplitter(
-                chunk_size=self.__chunk_size,
-                chunk_overlap=self.__chunk_overlap,
+            splitter = SemanticChunker(
+                embeddings=embedding_function,
                 add_start_index=True,
             )
 
             for chunk_count, chunk in enumerate(splitter.split_documents(docs)):
+                if not chunk.page_content.strip():
+                    continue
                 splits.append(
                     Document(
                         metadata={
@@ -46,26 +49,3 @@ class TextSplitter:
                 )
 
         return splits
-
-
-# Test
-# if __name__ == "__main__":
-#     DATASET_PATH: str = "./dataset"
-
-#     ts = TextSplitter(500, 20)
-#     from loader import load_dataset as ld
-
-#     dataset = ld(DATASET_PATH)
-#     docs = ts.split_dataset(dataset.contents())
-
-#     for data in docs:
-#         print(
-#             f"""# Chunk_{data.metadata["chunk_count"] + 1}
-# metadata:[
-#     "source": {data.metadata["source"]},
-#     "file_sha256": {data.metadata["file_sha256"]},
-#     "chunk_sha256": {data.metadata["chunk_sha256"]}
-# ],
-# Page_content: {data.page_content}
-#             """
-#         )
