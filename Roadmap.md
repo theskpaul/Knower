@@ -53,7 +53,9 @@ LLM
 
 ---
 
-# Version 2 — Robust Single-Domain RAG
+# Version 2 — Robust Single-Domain RAG ✅
+
+**Status:** Completed
 
 ## Goal
 

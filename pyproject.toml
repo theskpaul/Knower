@@ -1,9 +1,9 @@
 [project]
 name = "knower"
-version = "0.1"
+version = "0.2"
 description = "A RAG that can help you study, by letting you get insights for you documents from your local knowledge base"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.11"
 dependencies = [
     "langchain>=1.3.11",
     "langchain-chroma>=1.1.0",
