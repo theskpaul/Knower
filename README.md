@@ -25,8 +25,8 @@ ollama serve
 
 Example:
 ```bash
-ollama pull hf.co/CompendiumLabs/bge-base-en-v1.5-gguf
-ollama pull hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF
+ollama pull hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0
+ollama pull hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL
 ```
 
 4th, Navigate to the Knower directory and get respective packages using uv:
@@ -39,5 +39,5 @@ uv sync
 5th, Finally start Knower by executing:
 
 ```bash
-uv run main.py
+uv run src/main.py
 ```
