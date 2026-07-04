@@ -3,6 +3,7 @@ from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
 from database import VectorStore
 from loader import load_dataset as ld
+from menu import OptionPicker
 from text_splitter import TextSplitter as ts
 
 # EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
@@ -16,13 +17,8 @@ PERSISTENT_DIR = "./db"
 
 NUM_OF_TOP_CHUNKS: int = 2
 
-MENU = """
-What would you like to do?
-    (1) load dataset
-    (2) search - Default
-    (3) List Chunks
-    (4) Exit
->> """
+dataset = ld(DATASET_PATH)
+splitter = ts(dataset.contents())
 
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
 embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
@@ -62,35 +58,28 @@ def search():
     print(llm.invoke(prompt))
 
 
-def operation(option: str = ("search" or "2")):
-    dataset = ld(DATASET_PATH)
-    splitter = ts(dataset.contents())
+def option_1():
+    splits = splitter.split_dataset(embedder)
+    vector_store.store(splits)
 
-    if option == "1" or option == "load dataset":
-        splits = splitter.split_dataset(embedder)
 
-        vector_store.store(splits)
-    elif option == "2" or option == "search":
-        search()
-    elif option == "3" or option == "List Chunks":
-        for data in splitter.split_dataset(embedding_function=embedder):
-            print(f"""
-# Chunk_{data.metadata["chunk_count"] + 1}
-metadata:[
-    "source": {data.metadata["source"]},
-    "start_index": {data.metadata["start_index"]},
-    "file_sha256": {data.metadata["file_sha256"]},
-    "chunk_sha256": {data.metadata["chunk_sha256"]}
-],
-Page_content: {data.page_content}""")
-    elif option == "4" or option == "Exit":
-        exit(0)
-    else:
-        search()
-        pass
+def option_3():
+    for data in splitter.split_dataset(embedding_function=embedder):
+        print(f"""
+            # Chunk_{data.metadata["chunk_count"] + 1}
+            metadata:[
+                "source": {data.metadata["source"]},
+                "start_index": {data.metadata["start_index"]},
+                "file_sha256": {data.metadata["file_sha256"]},
+                "chunk_sha256": {data.metadata["chunk_sha256"]}
+            ],
+            Page_content: {data.page_content}""")
 
 
 if __name__ == "__main__":
-    while True:
-        selection = input(MENU).lower()
-        operation(selection)
+    menu = OptionPicker("What would you like to do?")
+    menu.set_option("load dataset", option_1)
+    menu.set_option("search", search, True)
+    menu.set_option("print chunks", option_3)
+    menu.set_option("exit", lambda: exit(0))
+    menu.run_forever()
