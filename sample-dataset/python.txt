@@ -1,0 +1,11 @@
+Python is a high-level, interpreted programming language created by Guido van Rossum and first released in 1991. It emphasizes readability through a clean syntax that allows programmers to express ideas using relatively little code.
+
+Python supports multiple programming paradigms, including procedural, object-oriented, and functional programming. Variables are dynamically typed, while indentation defines code blocks instead of braces, encouraging consistent formatting.
+
+The language includes an extensive standard library that provides modules for file handling, networking, mathematics, text processing, data structures, concurrency, and many other tasks. Developers can also install thousands of third-party packages using the pip package manager.
+
+Python is widely used in web development, data science, machine learning, automation, cybersecurity, scientific computing, and scripting. Popular libraries include NumPy for numerical computing, Pandas for data analysis, Matplotlib for visualization, and PyTorch and TensorFlow for deep learning.
+
+Python automatically manages memory through garbage collection and reference counting, allowing developers to focus more on application logic than manual memory management. Although Python is generally slower than compiled languages such as C or Rust, its productivity often outweighs raw execution speed.
+
+Because of its simple syntax and broad ecosystem, Python is one of the most widely taught programming languages in universities and coding bootcamps. It continues to evolve through community-driven development under the stewardship of the Python Software Foundation.
