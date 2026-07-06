@@ -1,5 +1,6 @@
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
+from sentence_transformers import CrossEncoder
 
 
 class VectorStore:
@@ -17,3 +18,18 @@ class VectorStore:
         return self.__vector_store.similarity_search(
             query=search_query, k=number_of_top_results
         )
+
+    def rerank(
+        self,
+        search_query: str,
+        number_of_top_results: int,
+        number_of_fetched_results: int,
+        model: str,
+    ):
+        reranker = CrossEncoder(model)
+        retrieved_docs = self.search(search_query, number_of_fetched_results)
+        pairs = [(search_query, doc.page_content) for doc in retrieved_docs]
+        scores = reranker.predict(pairs)
+        results = list(zip(scores, retrieved_docs))
+        results.sort(key=lambda x: x[0], reverse=True)
+        return results[:number_of_top_results]
