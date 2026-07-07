@@ -12,8 +12,3 @@ dependencies = [
     "langchain-text-splitters>=1.1.2",
     "sentence-transformers>=5.6.0",
 ]
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
