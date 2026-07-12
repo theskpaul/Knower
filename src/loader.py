@@ -1,11 +1,16 @@
 import hashlib
 import os
 
+import pymupdf4llm
+
 
 class load_dataset:
     def __init__(self, path):
         self.path = path
         self.__file_list = os.scandir(self.path)
+
+    def load_pdf(self, file) -> str:
+        return pymupdf4llm.to_markdown(file.path, page_chunks=True)
 
     def generate_sha256(self, file) -> str:
         with open(file.path, "rb") as f:
