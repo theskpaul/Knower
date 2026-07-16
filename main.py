@@ -1,9 +1,9 @@
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
-from database import VectorStore
-from loader import load_dataset as ld
-from menu import OptionPicker
-from text_splitter import TextSplitter as ts
+from rag.database import VectorStore
+from rag.loader import load_dataset as ld
+from rag.menu import OptionPicker
+from rag.text_splitter import TextSplitter as ts
 
 # EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
 # LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
@@ -12,19 +12,15 @@ EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
 LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 CROSS_RANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
 
-DATASET_PATH: str = "dataset"
-PERSISTENT_DIR = "db"
-
 NUM_OF_TOP_CHUNKS: int = 2
 
-dataset = ld(DATASET_PATH)
+dataset = ld()
 splitter = ts(dataset.contents())
 
 llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
 embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
 
 vector_store = VectorStore(
-    PERSISTENT_DIR,
     embedder,
 )
 

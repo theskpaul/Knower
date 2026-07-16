@@ -1,14 +1,23 @@
+import platform
+
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
+PERSISTENT_DIR_NIX = "./vectordb"
+PERSISTENT_DIR_WINDOWS = ".\\vectordb"
+
 
 class VectorStore:
-    def __init__(self, database_loaction, embedding_function):
-        self.database_location = database_loaction
+    def __init__(self, embedding_function):
+        if platform.system() == "Linux":
+            self.persist_directory = PERSISTENT_DIR_NIX
+        else:
+            self.persist_directory = PERSISTENT_DIR_WINDOWS
         self.embedding_function = embedding_function
         self.__vector_store = Chroma(
-            persist_directory=database_loaction, embedding_function=embedding_function
+            persist_directory=self.persist_directory,
+            embedding_function=embedding_function,
         )
 
     def store(self, document_list: list[Document]):

@@ -1,15 +1,23 @@
 import hashlib
 import os
+import platform
 
 import pymupdf4llm
 
+DATASET_PATH_NIX = "./dataset"
+DATASET_PATH_WINDOWS = ".\\dataset"
+
 
 class load_dataset:
-    def __init__(self, path):
-        self.path = path
-        self.__file_list = os.scandir(self.path)
+    def __init__(self):
+        if platform.system() == "Linux":
+            self.path = DATASET_PATH_NIX
+            self.__file_list = os.scandir(self.path)
+        elif platform.system() == "Windows":
+            self.path = DATASET_PATH_WINDOWS
+            self.__file_list = os.scandir(self.path)
 
-    def load_pdf(self, file) -> str:
+    def load_pdf(self, file):
         return pymupdf4llm.to_markdown(file.path, page_chunks=True)
 
     def generate_sha256(self, file) -> str:
