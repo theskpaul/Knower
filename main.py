@@ -38,11 +38,12 @@ def search(query: str, print_prompt: bool = False):
     for chunk in retrieved_docs:
         context += chunk.page_content + "\n\n"
 
-    prompt = INSTRUCTION + context + query
+    prompt = INSTRUCTION + context + "[Question]\n" + query
 
     if print_prompt is True:
         print(prompt, "\n")
-    print(llm.invoke(prompt))
+
+    print("[Answer]\n", llm.invoke(prompt))
 
 
 def reranked_search(query: str):
