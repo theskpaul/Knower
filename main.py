@@ -25,7 +25,7 @@ vector_store = VectorStore(
 )
 
 
-def search(query: str):
+def search(query: str, print_prompt: bool = False):
     retrieved_docs = vector_store.search(query, number_of_top_results=NUM_OF_TOP_CHUNKS)
 
     INSTRUCTION: str = """[Instruction]
@@ -40,6 +40,8 @@ def search(query: str):
 
     prompt = INSTRUCTION + context + query
 
+    if print_prompt is True:
+        print(prompt, "\n")
     print(llm.invoke(prompt))
 
 
@@ -126,12 +128,18 @@ def option_6():
     reranked_search(query)
 
 
+def option_7():
+    query: str = input("Ask me a question: ")
+    search(query, True)
+
+
 if __name__ == "__main__":
     menu = OptionPicker("What would you like to do?")
     menu.set_option("load dataset", option_1)
     menu.set_option("search", option_2, True)
-    menu.set_option("search - reranked", option_5, False)
-    menu.set_option("comparison search", option_6, False)
+    menu.set_option("search - debug", option_7)
+    menu.set_option("search - reranked", option_5)
+    menu.set_option("comparison search", option_6)
     menu.set_option("print chunks", option_3)
     menu.set_option("print reranked chunks", option_4)
     menu.set_option("exit", lambda: exit(0))
