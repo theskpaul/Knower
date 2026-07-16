@@ -12,7 +12,7 @@ class VectorStore:
     def __init__(self, embedding_function):
         if platform.system() == "Linux":
             self.persist_directory = PERSISTENT_DIR_NIX
-        else:
+        elif platform.system() == "Windows":
             self.persist_directory = PERSISTENT_DIR_WINDOWS
         self.embedding_function = embedding_function
         self.__vector_store = Chroma(
