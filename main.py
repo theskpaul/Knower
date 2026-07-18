@@ -2,8 +2,8 @@ from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
 from rag.database import VectorStore
 from rag.loader import load_dataset as ld
-from rag.menu import OptionPicker
 from rag.text_splitter import TextSplitter as ts
+from rag.utils.menu import OptionPicker
 
 # EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
 # LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
