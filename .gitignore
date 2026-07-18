@@ -12,3 +12,6 @@ wheels/
 # Others
 vectordb/
 dataset/*
+
+# Logs
+tmp/log/*
