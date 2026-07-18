@@ -10,9 +10,9 @@ class ModelManager:
 
     @log("Give a prompt to the LLM")
     def ask(self, input: str, temperature: float):
-        OllamaLLM(model=self.large_language_model, temperature=temperature).invoke(
-            input
-        )
+        return OllamaLLM(
+            model=self.large_language_model, temperature=temperature
+        ).invoke(input)
 
     def getEmbedder(self):
         return OllamaEmbeddings(model=self.embedding_model)
