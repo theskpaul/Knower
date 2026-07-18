@@ -4,6 +4,8 @@ import platform
 
 import pymupdf4llm
 
+from rag.utils.logger import log
+
 DATASET_PATH_NIX = "./dataset"
 DATASET_PATH_WINDOWS = ".\\dataset"
 
@@ -28,6 +30,7 @@ class load_dataset:
 
         return hash_func.hexdigest()
 
+    @log("Load Dataset into a Dict")
     def contents(self) -> list[dict]:
         dataset: list = []
 

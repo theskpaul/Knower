@@ -4,6 +4,8 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
+from rag.utils.logger import log
+
 PERSISTENT_DIR_NIX = "./vectordb"
 PERSISTENT_DIR_WINDOWS = ".\\vectordb"
 
@@ -20,14 +22,17 @@ class VectorStore:
             embedding_function=embedding_function,
         )
 
+    @log("Store Documents in Vector Store")
     def store(self, document_list: list[Document]):
         self.__vector_store.add_documents(document_list)
 
+    @log("Search in Vector Store")
     def search(self, search_query: str, number_of_top_results: int) -> list[Document]:
         return self.__vector_store.similarity_search(
             query=search_query, k=number_of_top_results
         )
 
+    @log("Reranking Search Results")
     def rerank(
         self,
         search_query: str,

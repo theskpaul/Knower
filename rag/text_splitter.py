@@ -3,11 +3,14 @@ import hashlib
 from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
+from rag.utils.logger import log
+
 
 class TextSplitter:
     def __init__(self, datasets: list[dict]):
         self.datasets = datasets
 
+    @log("Split Dataset")
     def split_dataset(
         self,
         embedding_function,
