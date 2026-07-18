@@ -1,7 +1,6 @@
-from langchain_ollama import OllamaEmbeddings, OllamaLLM
-
 from rag.database import VectorStore
 from rag.loader import load_dataset as ld
+from rag.model_manager import ModelManager
 from rag.text_splitter import TextSplitter as ts
 from rag.utils.menu import OptionPicker
 
@@ -13,12 +12,13 @@ LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
 CROSS_RANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
 
 NUM_OF_TOP_CHUNKS: int = 2
+TEMPERATURE: float = 0.7
 
 dataset = ld()
 splitter = ts(dataset.contents())
+modelManger = ModelManager(llm=LANGUAGE_MODEL, embedding_model=EMBEDDING_MODEL)
 
-llm = OllamaLLM(model=LANGUAGE_MODEL, temperature=0.7)
-embedder = OllamaEmbeddings(model=EMBEDDING_MODEL)
+embedder = modelManger.getEmbedder()
 
 vector_store = VectorStore(
     embedder,
@@ -43,7 +43,7 @@ def search(query: str, print_prompt: bool = False):
     if print_prompt is True:
         print(prompt, "\n")
 
-    print("[Answer]\n", llm.invoke(prompt))
+    print("[Answer]\n", modelManger.ask(prompt, temperature=TEMPERATURE))
 
 
 def reranked_search(query: str):
@@ -66,7 +66,7 @@ def reranked_search(query: str):
 
     prompt = INSTRUCTION + context + query
 
-    print(llm.invoke(prompt))
+    print(modelManger.ask(prompt, temperature=TEMPERATURE))
 
 
 def option_1():
