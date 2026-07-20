@@ -1,8 +1,10 @@
 from rag.database import VectorStore
-from rag.loader import load_dataset as ld
 from rag.model_manager import ModelManager
 from rag.text_splitter import TextSplitter as ts
 from rag.helper.menu import OptionPicker
+from rag.helper.file_manager import FileManager
+
+import platform
 
 # EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
 # LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
@@ -14,8 +16,12 @@ CROSS_RANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
 NUM_OF_TOP_CHUNKS: int = 2
 TEMPERATURE: float = 0.7
 
-dataset = ld()
-splitter = ts(dataset.contents())
+DATASET_PATH_NIX = "./dataset"
+DATASET_PATH_WINDOWS = ".\\dataset"
+
+fm = FileManager(dir_path=DATASET_PATH_WINDOWS) if platform.system() == "Windows" else FileManager(dir_path=DATASET_PATH_NIX)
+
+splitter = ts(fm.get_file_records())
 modelManger = ModelManager(llm=LANGUAGE_MODEL, embedding_model=EMBEDDING_MODEL)
 
 embedder = modelManger.getEmbedder()

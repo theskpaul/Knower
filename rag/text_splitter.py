@@ -4,10 +4,11 @@ from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
 from rag.helper.logger import log
+from rag.helper.file_record import Record
 
 
 class TextSplitter:
-    def __init__(self, datasets: list[dict]):
+    def __init__(self, datasets: list[Record]):
         self.datasets = datasets
 
     @log("Split Dataset")
@@ -19,13 +20,7 @@ class TextSplitter:
 
         for data in self.datasets:
             docs = [
-                Document(
-                    metadata={
-                        "source": data["metadata"]["source"],
-                        "file_sha256": data["metadata"]["sha256"],
-                    },
-                    page_content=data["content"],
-                )
+                data.to_document()
             ]
 
             splitter = SemanticChunker(
