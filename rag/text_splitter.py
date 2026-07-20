@@ -3,7 +3,7 @@ import hashlib
 from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
-from rag.utils.logger import log
+from rag.helper.logger import log
 
 
 class TextSplitter:

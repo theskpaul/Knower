@@ -4,7 +4,7 @@ import platform
 
 import pymupdf4llm
 
-from rag.utils.logger import log
+from rag.helper.logger import log
 
 DATASET_PATH_NIX = "./dataset"
 DATASET_PATH_WINDOWS = ".\\dataset"
