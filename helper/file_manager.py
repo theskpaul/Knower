@@ -2,9 +2,9 @@ import os
 import hashlib
 
 import puremagic as magic
-from rag.helper.file_record import Record
-from rag.helper.reader import read
-from rag.helper.logger import log
+from helper.file_record import Record
+from helper.reader import read
+from helper.logger import log
 
 class FileManager:
     def __init__(self, dir_path):

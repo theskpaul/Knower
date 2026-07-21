@@ -1,8 +1,8 @@
 from rag.database import VectorStore
 from rag.model_manager import ModelManager
 from rag.text_splitter import TextSplitter as ts
-from rag.helper.menu import OptionPicker
-from rag.helper.file_manager import FileManager
+from helper.menu import OptionPicker
+from helper.file_manager import FileManager
 
 import platform
 

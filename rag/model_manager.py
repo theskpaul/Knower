@@ -1,6 +1,6 @@
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
-from rag.helper.logger import log
+from helper.logger import log
 
 
 class ModelManager:

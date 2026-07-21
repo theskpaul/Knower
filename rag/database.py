@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
-from rag.helper.logger import log
+from helper.logger import log
 
 PERSISTENT_DIR_NIX = "./vectordb"
 PERSISTENT_DIR_WINDOWS = ".\\vectordb"
