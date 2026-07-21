@@ -6,12 +6,19 @@ from rag.helper.file_manager import FileManager
 
 import platform
 
-# EMBEDDING_MODEL = "hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0"
-# LANGUAGE_MODEL = "hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF"
+EMBEDDING_MODEL = {
+    'Qwen3-Embedding-0.6B-GGUF':'hf.co/Qwen/Qwen3-Embedding-0.6B-GGUF:Q8_0',
+    'BGE-Base-en-v1.5-GGUF':'hf.co/CompendiumLabs/bge-base-en-v1.5-gguf'
+}
 
-EMBEDDING_MODEL = "hf.co/CompendiumLabs/bge-base-en-v1.5-gguf"
-LANGUAGE_MODEL = "hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL"
-CROSS_RANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
+LANGUAGE_MODEL = {
+    'Llama-3.2-1B-Instruct-GGUF':'hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
+    'Gemma-4-E2B-IT-Qat-GGUF':'hf.co/unsloth/gemma-4-E2B-it-qat-GGUF:UD-Q4_K_XL'
+}
+
+CROSS_RANKER_MODEL = {
+    'ms-marco-MiniLM-L6-v2':'cross-encoder/ms-marco-MiniLM-L6-v2'
+}
 
 NUM_OF_TOP_CHUNKS: int = 2
 TEMPERATURE: float = 0.7
@@ -22,7 +29,7 @@ DATASET_PATH_WINDOWS = ".\\dataset"
 fm = FileManager(dir_path=DATASET_PATH_WINDOWS) if platform.system() == "Windows" else FileManager(dir_path=DATASET_PATH_NIX)
 
 splitter = ts(fm.get_file_records())
-modelManger = ModelManager(llm=LANGUAGE_MODEL, embedding_model=EMBEDDING_MODEL)
+modelManger = ModelManager(llm=LANGUAGE_MODEL["Gemma-4-E2B-IT-Qat-GGUF"], embedding_model=EMBEDDING_MODEL["BGE-Base-en-v1.5-GGUF"])
 
 embedder = modelManger.getEmbedder()
 
@@ -57,7 +64,7 @@ def reranked_search(query: str, score_threshold:float = 0.0):
         search_query=query,
         number_of_top_results=5,
         number_of_fetched_results=20,
-        model=CROSS_RANKER_MODEL,
+        model=CROSS_RANKER_MODEL["ms-marco-MiniLM-L6-v2"],
     )
 
     INSTRUCTION: str = """[Instruction]
@@ -105,7 +112,7 @@ def option_4():
         search_query=query,
         number_of_top_results=5,
         number_of_fetched_results=10,
-        model=CROSS_RANKER_MODEL,
+        model=CROSS_RANKER_MODEL["ms-marco-MiniLM-L6-v2"],
     ):
         print(
             f"""
