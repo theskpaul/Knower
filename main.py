@@ -52,7 +52,7 @@ def search(query: str, print_prompt: bool = False):
     print("[Answer]\n", modelManger.ask(prompt, temperature=TEMPERATURE))
 
 
-def reranked_search(query: str):
+def reranked_search(query: str, score_threshold:float = 0.0):
     retrieved_docs = vector_store.rerank(
         search_query=query,
         number_of_top_results=5,
@@ -68,7 +68,8 @@ def reranked_search(query: str):
 
     context: str = "[Context]\n"
     for score, chunk in retrieved_docs:
-        context += chunk.page_content + "\n"
+        if score > score_threshold:
+            context += f"({score}) : {chunk.page_content}" + "\n"
 
     prompt = INSTRUCTION + context + "[Question]\n" + query
 
