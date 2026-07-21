@@ -39,5 +39,5 @@ uv sync
 5th, Finally start Knower by executing:
 
 ```bash
-uv run src/main.py
+uv run main.py
 ```
