@@ -13,6 +13,7 @@ dependencies = [
     "puremagic>=1.30",
     "pymupdf-layout>=1.28.0",
     "pymupdf4llm>=1.28.0",
+    "pyside6>=6.11.1",
     "sentence-transformers>=5.6.0",
     "torch>=2.12.1",
     "torchaudio>=2.11.0",

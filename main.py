@@ -3,6 +3,7 @@ from rag.model_manager import ModelManager
 from rag.text_splitter import TextSplitter as ts
 from helper.menu import OptionPicker
 from helper.file_manager import FileManager
+from app.window import APPWindow
 
 import platform
 
@@ -149,13 +150,12 @@ def option_7():
 
 
 if __name__ == "__main__":
-    menu = OptionPicker("What would you like to do?")
-    menu.set_option("load dataset", option_1)
-    menu.set_option("search", option_2, True)
-    menu.set_option("search - debug", option_7)
-    menu.set_option("search - reranked", option_5)
-    menu.set_option("comparison search", option_6)
-    menu.set_option("print chunks", option_3)
-    menu.set_option("print reranked chunks", option_4)
-    menu.set_option("exit", lambda: exit(0))
-    menu.run_forever()
+    from PySide6.QtWidgets import QApplication
+    import sys
+
+    app = QApplication(sys.argv)
+
+    window = APPWindow(LLM_Models=LANGUAGE_MODEL, Embedding_Model=EMBEDDING_MODEL)
+    window.show()
+
+    sys.exit(app.exec())
