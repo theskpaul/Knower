@@ -12,6 +12,12 @@ wheels/
 # Others
 vectordb/
 dataset/*
+data/chat_history.db
 
 # Logs
 tmp/log/*
+
+# IDE & Editors
+.idea/
+.vscode/
+.zed
