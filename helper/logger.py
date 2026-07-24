@@ -9,7 +9,7 @@ logging.basicConfig(
     format="{asctime} - {levelname} - {name} - {message}",
     style="{",
     datefmt="%Y-%m-%d %H:%M",
-    filename=f"tmp/log/{time.strftime('%Y-%m-%d_%H-%M', current_time)}-app.log",
+    filename=f"data/log/{time.strftime('%Y-%m-%d_%H-%M', current_time)}-app.log",
     encoding="utf-8",
     filemode="a",
 )
