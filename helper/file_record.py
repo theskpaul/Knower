@@ -20,3 +20,12 @@ class Record:
         return Document(
             page_content=self.content, metadata={**self.metadata, "source": self.name}
         )
+
+
+@dataclass
+class Model:
+    name: str
+    model: str
+    size: int
+    capabilities: list
+    details: dict = field(default_factory=dict)
