@@ -1,21 +1,14 @@
-import platform
-
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
+from default import PATH
 from helper.logger import log
-
-PERSISTENT_DIR_NIX = "./vectordb"
-PERSISTENT_DIR_WINDOWS = ".\\vectordb"
 
 
 class VectorStore:
     def __init__(self, embedding_function):
-        if platform.system() == "Linux":
-            self.persist_directory = PERSISTENT_DIR_NIX
-        elif platform.system() == "Windows":
-            self.persist_directory = PERSISTENT_DIR_WINDOWS
+        self.persist_directory = PATH["vectordb"]
         self.embedding_function = embedding_function
         self.__vector_store = Chroma(
             persist_directory=self.persist_directory,
