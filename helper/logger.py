@@ -2,14 +2,17 @@ import functools
 import logging
 import time
 
+from default import PATH
+
 current_time = time.localtime()
+name_format = f"{time.strftime('%Y-%m-%d_%H-%M', current_time)}-app.log"
 
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} - {levelname} - {name} - {message}",
     style="{",
     datefmt="%Y-%m-%d %H:%M",
-    filename=f"data/log/{time.strftime('%Y-%m-%d_%H-%M', current_time)}-app.log",
+    filename=PATH["log"] / name_format,
     encoding="utf-8",
     filemode="a",
 )
