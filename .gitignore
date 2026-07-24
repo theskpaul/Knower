@@ -9,13 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-# Others
-vectordb/
-dataset/*
-data/chat_history.db
-
-# Logs
-tmp/log/*
+# Temporary files
+data/
 
 # IDE & Editors
 .idea/
