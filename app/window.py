@@ -11,16 +11,16 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QListWidget,
+    QListWidgetItem,
     QPushButton,
     QScrollArea,
-    QListWidgetItem,
     QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
-from app.worker import ChatWorker
 from app.models import create_tables
+from app.worker import ChatWorker
 
 create_tables()
 
@@ -39,6 +39,7 @@ class APPWindow(QWidget):
         self.LLM_Models = LLM_Models
         self.Embedding_Model = Embedding_Model
         self.current_chat = None  # <-- Add this line
+        self.default_search_mode = 0
         self.setWindowTitle("Knower")
         self.setMinimumSize(400, 550)
         self.showMaximized()
@@ -46,6 +47,7 @@ class APPWindow(QWidget):
         self.build_ui()
 
         self.load_chat_history()
+
         def update_model_info(self, model):
             model_name = LLM_Models.get(model, "❓ Unknown")
             self.model_info.setText(model_name)
@@ -64,10 +66,7 @@ class APPWindow(QWidget):
         self.current_chat = chat_id
         messages = get_messages(chat_id)
         for message in messages:
-            self.add_message(
-                message["role"],
-                message["content"]
-            )
+            self.add_message(message["role"], message["content"])
 
     # Upload data sheet to increase compalibility
     def upload_document(self):
@@ -181,13 +180,9 @@ class APPWindow(QWidget):
                 row.deleteLater()
 
     def show_reply(self, reply):
-        self.remove_last_message()      # remove "Thinking..."
+        self.remove_last_message()  # remove "Thinking..."
         self.add_message("ai", reply)
-        add_message(
-            self.current_chat,
-            "assistant",
-            reply
-        )
+        add_message(self.current_chat, "assistant", reply)
 
     def show_error(self, error):
         self.remove_last_message()
@@ -242,6 +237,7 @@ class APPWindow(QWidget):
             selected_model,
             embedding_model=self.Embedding_Model["BGE-Base-en-v1.5-GGUF"],
             query=query,
+            search_mode=self.default_search_mode,
         )
 
         # Move worker to thread
@@ -263,6 +259,14 @@ class APPWindow(QWidget):
     def new_chat(self):
         self.clear_chat()
         self.current_chat = None
+
+    def change_search_mode(self, checked):
+        if checked:
+            self.default_search_mode = 1
+            self.search_mode.setText("Ranked Search")
+        else:
+            self.default_search_mode = 0
+            self.search_mode.setText("Normal Search")
 
     def build_ui(self):
 
@@ -404,15 +408,27 @@ class APPWindow(QWidget):
         """)
         self.input_box.setPlaceholderText("Message Knower AI...")
 
-        attach = QPushButton("📎")
-        attach.clicked.connect(self.upload_attachment)
+        self.search_mode = QPushButton("Normal Search")
+        self.search_mode.setCheckable(True)
+        self.search_mode.setStyleSheet("""
+            QPushButton:checked {
+                background-color: #4CAF50;
+                color: white;
+            }
+            QPushButton:!checked {
+                background-color: #f44336;
+                color: white;
+            }
+        """)
+
+        self.search_mode.toggled.connect(self.change_search_mode)
+
         bottom = QHBoxLayout()
         self.model_box = QComboBox()
         added = False
         for display_name, model_name in self.LLM_Models.items():
-            # if model_name in installed_models:
-                self.model_box.addItem(display_name)
-                added = True
+            self.model_box.addItem(display_name)
+            added = True
         if not added:
             self.model_box.addItem("No Models Found")
 
@@ -438,7 +454,7 @@ class APPWindow(QWidget):
         """)
 
         model_layout = QVBoxLayout()
-        bottom.addWidget(attach)
+        bottom.addWidget(self.search_mode)
         model_layout.addWidget(self.model_box)
 
         bottom.addLayout(model_layout)
