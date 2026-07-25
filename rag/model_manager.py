@@ -7,20 +7,24 @@ from helper.logger import log
 
 def getOllamaModelList():
     OLLAMA_URL = "http://localhost:11434"
-    req = requests.get(OLLAMA_URL + "/api/tags")
-    output = req.json()
+    try:
+        req = requests.get(OLLAMA_URL + "/api/tags")
+        output = req.json()
 
-    result = []
-    for item in output["models"]:
-        result.append(
-            Model(
-                name=item["name"],
-                model=item["model"],
-                size=item["size"],
-                capabilities=item["capabilities"],
-                details=item["details"],
+        result = []
+
+        for item in output["models"]:
+            result.append(
+                Model(
+                    name=item["name"],
+                    model=item["model"],
+                    size=item["size"],
+                    capabilities=item["capabilities"],
+                    details=item["details"],
+                )
             )
-        )
+    except requests.exceptions.RequestException:
+        result = []
 
     return result
 
