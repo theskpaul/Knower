@@ -13,16 +13,14 @@ class ChatWorker(QObject):
     finished = Signal(str)
     error = Signal(str)
 
-    def __init__(self, llm_model, embedding_model, query, search_mode):
+    def __init__(self, query: str, rank_search: bool):
         super().__init__()
         self.query = query
-        self.model_manager = ModelManager(
-            llm=llm_model, embedding_model=embedding_model
-        )
+        self.model_manager = ModelManager()
         self.vector_store = VectorStore(
             embedding_function=self.model_manager.getEmbedder()
         )
-        self.search_mode = search_mode
+        self.rank_search = rank_search
 
     def prompt(self, score_threshold=0.0):
         INSTRUCTION: str = """[Instruction]
@@ -33,14 +31,14 @@ class ChatWorker(QObject):
 
         context: str = "[Context]\n"
 
-        if self.search_mode == 0:
+        if self.rank_search:
             retrieved_docs = self.vector_store.search(
                 self.query, number_of_top_results=NUM_OF_TOP_CHUNKS
             )
 
             for chunk in retrieved_docs:
                 context += chunk.page_content + "\n"
-        elif self.search_mode == 1:
+        else:
             retrieved_docs = self.vector_store.rerank(
                 search_query=self.query,
                 number_of_top_results=5,
