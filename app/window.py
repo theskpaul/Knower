@@ -235,13 +235,15 @@ class APPWindow(QWidget):
             row.deleteLater()
 
     def send_message(self):
-        from PySide6.QtCore import QThread  # , QObject, Signal, Slot
+        from PySide6.QtCore import QThread
 
         from app.worker import ChatWorker
+        from helper.config import add_entry
 
         query = self.input_box.toPlainText().strip()
 
         selected_type = self.model_box.currentText()
+        add_entry("LANGUAGE_MODEL", selected_type)
         selected_model = self.LLM_Models.get(selected_type, "No Model Found")
 
         if not query:
