@@ -1,7 +1,6 @@
 # import subprocess
 import os
 import shutil
-from datetime import datetime
 
 from PySide6.QtCore import Qt, QThread  # , QObject, Signal, Slot
 from PySide6.QtWidgets import (
@@ -89,33 +88,27 @@ class APPWindow(QWidget):
 
     # Upload data sheet to increase compalibility
     def upload_document(self):
-        file_name_list, _ = QFileDialog.getOpenFileNames(
+        file_list, _ = QFileDialog.getOpenFileNames(
             self,
             "Select Document",
             "",
             "All Supported Files (*.txt *.pdf);;Text Files (*.txt);;PDF Files (*.pdf)",
         )
 
-        for file_name in file_name_list:
-            if file_name:
+        for source in file_list:
+            if source:
                 # Create the upload folder if it doesn't exist
                 upload_folder = PATH["sources"]
 
-                # Get original filename and extension
-                base = os.path.splitext(os.path.basename(file_name))[0]
-                ext = os.path.splitext(file_name)[1]
+                name = os.path.basename(source)
+                destination = upload_folder / name
 
-                # Add timestamp to the filename
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                new_name = f"{base}_{timestamp}{ext}"
+                if source == destination:
+                    print(f"Skipped (Already in place): {source}")
+                    continue
 
-                # Destination path
-                destination = upload_folder / new_name
-
-                # Copy the file
-                shutil.copy2(file_name, destination)  # copy2 preserves metadata
-
-                print(f"Original: {file_name}")
+                shutil.copy2(source, destination)
+                print(f"Original: {source}")
                 print(f"Saved as: {destination}")
 
     def process_documents(self):
