@@ -227,7 +227,7 @@ class APPWindow(QWidget):
         add_message(self.current_chat, "user", query)
         if new_chat:
             update_conversation_title(self.current_chat, query[:40])
-            # self.load_chat_history()
+            self.load_chat_history()
 
         self.input_box.clear()
         # Show temporary AI message
@@ -238,6 +238,7 @@ class APPWindow(QWidget):
 
         # Create worker
         self.worker = ChatWorker(query=query, rank_search=self.rank_search)
+        self.worker.model_manager.large_language_model = selected_model
 
         # Move worker to thread
         self.worker.moveToThread(self.thread)
