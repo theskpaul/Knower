@@ -1,8 +1,7 @@
-from .db import get_connection
+from app.db import get_connection
 
 
 def create_conversation(title):
-
     conn = get_connection()
     cursor = conn.cursor()
 
