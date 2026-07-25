@@ -10,18 +10,18 @@ class VectorStore:
     def __init__(self, embedding_function):
         self.persist_directory = PATH["vectordb"]
         self.embedding_function = embedding_function
-        self.__vector_store = Chroma(
+        self.chroma = Chroma(
             persist_directory=self.persist_directory,
             embedding_function=embedding_function,
         )
 
     @log("Store Documents in Vector Store")
     def store(self, document_list: list[Document]):
-        self.__vector_store.add_documents(document_list)
+        self.chroma.add_documents(document_list)
 
     @log("Search in Vector Store")
     def search(self, search_query: str, number_of_top_results: int) -> list[Document]:
-        return self.__vector_store.similarity_search(
+        return self.chroma.similarity_search(
             query=search_query, k=number_of_top_results
         )
 
