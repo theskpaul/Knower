@@ -463,12 +463,12 @@ class APPWindow(QWidget):
         self.search_mode.setCheckable(True)
         self.search_mode.setStyleSheet("""
             QPushButton:checked {
-                background-color: #4CAF50;
-                color: white;
+                background-color: #f44336;
+                color: #FFFFFF;
             }
             QPushButton:!checked {
-                background-color: #f44336;
-                color: white;
+                background-color: #4CAF50;
+                color: #000000;
             }
         """)
 
