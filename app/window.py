@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 
 from app.models import create_tables
 from app.worker import ChatWorker
+from default import PATH
 
 create_tables()
 
@@ -94,8 +95,7 @@ class APPWindow(QWidget):
 
         if file_name:
             # Create the upload folder if it doesn't exist
-            upload_folder = "documents"
-            os.makedirs(upload_folder, exist_ok=True)
+            upload_folder = PATH["sources"]
 
             # Get original filename and extension
             base = os.path.splitext(os.path.basename(file_name))[0]
@@ -106,7 +106,7 @@ class APPWindow(QWidget):
             new_name = f"{base}_{timestamp}{ext}"
 
             # Destination path
-            destination = os.path.join(upload_folder, new_name)
+            destination = upload_folder / new_name
 
             # Copy the file
             shutil.copy2(file_name, destination)  # copy2 preserves metadata
