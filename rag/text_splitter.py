@@ -3,8 +3,8 @@ import hashlib
 from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
-from helper.logger import log
 from helper.file_record import Record
+from helper.logger import log
 
 
 class TextSplitter:
@@ -18,15 +18,13 @@ class TextSplitter:
     ) -> list[Document]:
         splits: list[Document] = []
 
-        for data in self.datasets:
-            docs = [
-                data.to_document()
-            ]
+        splitter = SemanticChunker(
+            embeddings=embedding_function,
+            add_start_index=True,
+        )
 
-            splitter = SemanticChunker(
-                embeddings=embedding_function,
-                add_start_index=True,
-            )
+        for data in self.datasets:
+            docs = [data.to_document()]
 
             for chunk_count, chunk in enumerate(splitter.split_documents(docs)):
                 if not chunk.page_content.strip():
