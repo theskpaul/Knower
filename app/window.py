@@ -2,24 +2,10 @@
 import os
 import shutil
 
-from PySide6.QtCore import Qt, QThread  # , QObject, Signal, Slot
-from PySide6.QtWidgets import (
-    QComboBox,
-    QFileDialog,
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QListWidget,
-    QListWidgetItem,
-    QPushButton,
-    QScrollArea,
-    QTextEdit,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget
 
 from app.models import create_tables
-from app.worker import ChatWorker
 from default import PATH
 
 create_tables()
@@ -33,10 +19,7 @@ from app.chat import (
 )
 from default import DEFAULT_CONFIG
 from helper.config import load_config
-from helper.file_manager import FileManager
-from rag.database import VectorStore
 from rag.model_manager import ModelManager, getOllamaModelList
-from rag.text_splitter import TextSplitter as ts
 
 
 def get_language_models() -> dict:
@@ -95,6 +78,8 @@ class APPWindow(QWidget):
             self.title.setText("No Connection Found!!!")
 
     def load_chat_history(self):
+        from PySide6.QtWidgets import QListWidgetItem
+
         self.history.clear()
         chats = get_conversations()
         for chat in chats:
@@ -111,6 +96,8 @@ class APPWindow(QWidget):
             self.add_message(message["role"], message["content"])
 
     def upload_document(self):
+        from PySide6.QtWidgets import QFileDialog
+
         file_list, _ = QFileDialog.getOpenFileNames(
             self,
             "Select Document",
@@ -136,11 +123,17 @@ class APPWindow(QWidget):
                 print(f"Saved as: {destination}")
 
     def process_documents(self):
+        from helper.file_manager import FileManager
+        from rag.database import VectorStore
+        from rag.text_splitter import TextSplitter
+
         fm = FileManager(PATH["sources"])
         vector_store = VectorStore(embedding_function=model_manager.getEmbedder())
         vector_store.chroma.reset_collection()
 
-        splits = ts(fm.get_file_records()).split_dataset(model_manager.getEmbedder())
+        splits = TextSplitter(fm.get_file_records()).split_dataset(
+            model_manager.getEmbedder()
+        )
         vector_store.store(splits)
 
     def clear_chat(self):
@@ -166,6 +159,8 @@ class APPWindow(QWidget):
         self.messages = []
 
     def add_message(self, sender, message):
+        from PySide6.QtWidgets import QHBoxLayout, QLabel
+
         bubble = QLabel(message)
         bubble.setWordWrap(True)
         bubble.setMaximumWidth(500)
@@ -240,14 +235,19 @@ class APPWindow(QWidget):
             row.deleteLater()
 
     def send_message(self):
+        from PySide6.QtCore import QThread  # , QObject, Signal, Slot
+
+        from app.worker import ChatWorker
+
         query = self.input_box.toPlainText().strip()
-        self.send.setEnabled(False)
 
         selected_type = self.model_box.currentText()
         selected_model = self.LLM_Models.get(selected_type, "No Model Found")
 
         if not query:
             return
+
+        self.send.setEnabled(False)
 
         new_chat = False
         if self.current_chat is None:
@@ -305,6 +305,17 @@ class APPWindow(QWidget):
             self.search_mode.setText("Normal Search")
 
     def build_ui(self):
+        from PySide6.QtWidgets import (
+            QComboBox,
+            QFrame,
+            QHBoxLayout,
+            QLabel,
+            QListWidget,
+            QPushButton,
+            QScrollArea,
+            QTextEdit,
+            QVBoxLayout,
+        )
 
         # ===== Main Layout =====
         main_layout = QHBoxLayout(self)
