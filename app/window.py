@@ -42,9 +42,14 @@ from rag.text_splitter import TextSplitter as ts
 def get_language_models() -> dict:
     llms = {}
     model_list = getOllamaModelList()
-    for model in model_list:
-        if "completion" in model.capabilities and "embedding" not in model.capabilities:
-            llms[model.name] = model.model
+
+    if model_list:
+        for model in model_list:
+            if (
+                "completion" in model.capabilities
+                and "embedding" not in model.capabilities
+            ):
+                llms[model.name] = model.model
 
     return llms
 
@@ -78,8 +83,16 @@ class APPWindow(QWidget):
         self.update_model_info(local_lm_entry)
 
     def update_model_info(self, model):
-        model_name: str = self.LLM_Models[model]
-        self.model_box.setCurrentIndex(self.model_box.findText(model_name))
+        model_name: str = self.LLM_Models.get(model, "")
+
+        if model_name:
+            self.model_box.setCurrentIndex(self.model_box.findText(model_name))
+        else:
+            self.model_box.setEnabled(False)
+            self.send.setEnabled(False)
+            self.input_box.setEnabled(False)
+            self.search_mode.setEnabled(False)
+            self.title.setText("No Connection Found!!!")
 
     def load_chat_history(self):
         self.history.clear()
@@ -231,7 +244,7 @@ class APPWindow(QWidget):
         self.send.setEnabled(False)
 
         selected_type = self.model_box.currentText()
-        selected_model = self.LLM_Models[selected_type]
+        selected_model = self.LLM_Models.get(selected_type, "No Model Found")
 
         if not query:
             return
@@ -388,9 +401,9 @@ class APPWindow(QWidget):
         right_layout = QVBoxLayout(right)
         right_layout.setContentsMargins(25, 20, 25, 20)
 
-        title = QLabel("How can I help you today?")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("""
+        self.title = QLabel("How can I help you today?")
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title.setStyleSheet("""
             color:#F8FAFC;
             font-size:28px;
             font-weight:bold;
@@ -486,7 +499,7 @@ class APPWindow(QWidget):
         bottom.addWidget(self.send)
         bottom.addStretch()
 
-        right_layout.addWidget(title)
+        right_layout.addWidget(self.title)
         right_layout.addSpacing(20)
         right_layout.addWidget(self.chat)
         right_layout.addSpacing(10)
