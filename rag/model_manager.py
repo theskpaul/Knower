@@ -9,9 +9,9 @@ from helper.logger import log
 
 class ModelManager:
     def __init__(self) -> None:
-        load = load_config()
-        llm = load["LANGUAGE_MODEL"]
-        em = load["EMBEDDING_MODEL"]
+        load: dict[str, str] = load_config()
+        llm = load.get("LANGUAGE_MODEL")
+        em = load.get("EMBEDDING_MODEL")
 
         self.large_language_model = llm if llm else DC["LANGUAGE_MODEL"]
         self.embedding_model = em if em else DC["EMBEDDING_MODEL"]
