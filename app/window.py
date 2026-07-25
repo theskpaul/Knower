@@ -31,29 +31,39 @@ from app.chat import (
     get_messages,
     update_conversation_title,
 )
+from default import DEFAULT_CONFIG
+from helper.config import load_config
 from helper.file_manager import FileManager
 from rag.database import VectorStore
-from rag.model_manager import ModelManager
+from rag.model_manager import ModelManager, getOllamaModelList
 from rag.text_splitter import TextSplitter as ts
+
+
+def get_language_models() -> dict:
+    llms = {}
+    model_list = getOllamaModelList()
+    for model in model_list:
+        if "completion" in model.capabilities and "embedding" not in model.capabilities:
+            llms[model.name] = model.model
+
+    return llms
+
+
+language_models = get_language_models()
+
+config = load_config()
+local_lm_entry: str = config.get("LANGUAGE_MODEL", DEFAULT_CONFIG["LANGUAGE_MODEL"])
+
+local_em_entry = config.get("EMBEDDING_MODEL", DEFAULT_CONFIG["EMBEDDING_MODEL"])
+
+model_manager = ModelManager(
+    language_model=local_lm_entry, embedding_model=local_em_entry
+)
 
 
 class APPWindow(QWidget):
     def __init__(self):
         super().__init__()
-
-        self.model_manager = ModelManager()
-
-        def get_language_models() -> dict:
-            llms = {}
-            model_list = self.model_manager.getOllamaModelList()
-            for model in model_list:
-                if (
-                    "completion" in model.capabilities
-                    and "embedding" not in model.capabilities
-                ):
-                    llms[model.name] = model.model
-
-            return llms
 
         self.LLM_Models = get_language_models()
         self.current_chat = None  # <-- Add this line
@@ -65,10 +75,11 @@ class APPWindow(QWidget):
         self.build_ui()
 
         self.load_chat_history()
+        self.update_model_info(local_lm_entry)
 
-        def update_model_info(self, model):
-            model_name = self.LLM_Models.get(model, "❓ Unknown")
-            self.model_info.setText(model_name)
+    def update_model_info(self, model):
+        model_name: str = self.LLM_Models[model]
+        self.model_box.setCurrentIndex(self.model_box.findText(model_name))
 
     def load_chat_history(self):
         self.history.clear()
@@ -86,7 +97,6 @@ class APPWindow(QWidget):
         for message in messages:
             self.add_message(message["role"], message["content"])
 
-    # Upload data sheet to increase compalibility
     def upload_document(self):
         file_list, _ = QFileDialog.getOpenFileNames(
             self,
@@ -114,12 +124,10 @@ class APPWindow(QWidget):
 
     def process_documents(self):
         fm = FileManager(PATH["sources"])
-        vector_store = VectorStore(embedding_function=self.model_manager.getEmbedder())
+        vector_store = VectorStore(embedding_function=model_manager.getEmbedder())
         vector_store.chroma.reset_collection()
 
-        splits = ts(fm.get_file_records()).split_dataset(
-            self.model_manager.getEmbedder()
-        )
+        splits = ts(fm.get_file_records()).split_dataset(model_manager.getEmbedder())
         vector_store.store(splits)
 
     def clear_chat(self):
@@ -192,11 +200,13 @@ class APPWindow(QWidget):
                 row.deleteLater()
 
     def show_reply(self, reply):
+        self.send.setEnabled(True)
         self.remove_last_message()  # remove "Thinking..."
         self.add_message("ai", reply)
         add_message(self.current_chat, "assistant", reply)
 
     def show_error(self, error):
+        self.send.setEnabled(True)
         self.remove_last_message()
         self.add_message("ai", f"Error: {error}")
 
@@ -218,6 +228,8 @@ class APPWindow(QWidget):
 
     def send_message(self):
         query = self.input_box.toPlainText().strip()
+        self.send.setEnabled(False)
+
         selected_type = self.model_box.currentText()
         selected_model = self.LLM_Models[selected_type]
 
@@ -231,6 +243,7 @@ class APPWindow(QWidget):
 
         # Show user message immediately
         self.add_message("user", query)
+
         # this add function used for database
         add_message(self.current_chat, "user", query)
         if new_chat:
@@ -238,15 +251,17 @@ class APPWindow(QWidget):
             self.load_chat_history()
 
         self.input_box.clear()
+
         # Show temporary AI message
         self.add_message("ai", "Thinking...")
 
         # Create thread
         self.thread = QThread()
 
-        # Create worker
-        self.worker = ChatWorker(query=query, rank_search=self.rank_search)
-        self.worker.model_manager.large_language_model = selected_model
+        model_manager.large_language_model = selected_model
+        self.worker = ChatWorker(
+            query=query, model_manager=model_manager, rank_search=self.rank_search
+        )
 
         # Move worker to thread
         self.worker.moveToThread(self.thread)
@@ -299,9 +314,7 @@ class APPWindow(QWidget):
         logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logo.setStyleSheet(""" color:white; font-size:24px; font-weight:bold; """)
 
-        self.new_chat_btn = QPushButton(
-            "+ New Chat"
-        )  # add abutton that create new chat
+        self.new_chat_btn = QPushButton("+ New Chat")
         self.new_chat_btn.clicked.connect(self.new_chat)
         self.history = QListWidget()  # crearte the history section
         self.history.itemClicked.connect(self.open_chat)
@@ -330,8 +343,8 @@ class APPWindow(QWidget):
         upload_btn = QPushButton("Upload Documents")
         upload_btn.clicked.connect(self.upload_document)
 
-        process_btn = QPushButton("Process Documents")
-        process_btn.clicked.connect(self.process_documents)
+        self.process_btn = QPushButton("Process Documents")
+        self.process_btn.clicked.connect(self.process_documents)
 
         # Logo
         sidebar_layout.addWidget(logo)
@@ -362,7 +375,7 @@ class APPWindow(QWidget):
         sidebar_layout.addStretch()
 
         sidebar_layout.addWidget(upload_btn)
-        sidebar_layout.addWidget(process_btn)
+        sidebar_layout.addWidget(self.process_btn)
 
         # =========== Right Side =============
         right = QFrame()
