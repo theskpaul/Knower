@@ -99,11 +99,12 @@ class APPWindow(QWidget):
             if source:
                 # Create the upload folder if it doesn't exist
                 upload_folder = PATH["sources"]
+                upload_folder.mkdir(parents=True, exist_ok=True)
 
                 name = os.path.basename(source)
                 destination = upload_folder / name
 
-                if source == destination:
+                if os.path.exists(destination):
                     print(f"Skipped (Already in place): {source}")
                     continue
 
