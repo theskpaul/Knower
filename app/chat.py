@@ -6,10 +6,7 @@ def create_conversation(title):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "INSERT INTO conversations(title) VALUES(?)",
-        (title,)
-    )
+    cursor.execute("INSERT INTO conversations(title) VALUES(?)", (title,))
 
     conn.commit()
 
@@ -25,11 +22,14 @@ def add_message(conversation_id, role, content):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         INSERT INTO messages
         (conversation_id, role, content)
         VALUES (?, ?, ?)
-    """, (conversation_id, role, content))
+    """,
+        (conversation_id, role, content),
+    )
 
     conn.commit()
     conn.close()
@@ -40,12 +40,15 @@ def get_messages(conversation_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT *
         FROM messages
         WHERE conversation_id=?
         ORDER BY id
-    """, (conversation_id,))
+    """,
+        (conversation_id,),
+    )
 
     rows = cursor.fetchall()
 
@@ -71,21 +74,19 @@ def get_conversations():
 
     return rows
 
+
 def update_conversation_title(conversation_id, title):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE conversations
         SET title = ?
         WHERE id = ?
-    """, (title, conversation_id))
+    """,
+        (title, conversation_id),
+    )
 
     conn.commit()
     conn.close()
-
-def rename_chat(self, conversation_id, title):
-    update_conversation_title(conversation_id, title)
-
-    # Refresh the chat list
-    self.load_chat_history()
