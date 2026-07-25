@@ -31,15 +31,30 @@ from app.chat import (
     get_messages,
     update_conversation_title,
 )
+from rag.model_manager import ModelManager
 
 
 class APPWindow(QWidget):
-    def __init__(self, LLM_Models: dict, Embedding_Model: dict):
+    def __init__(self):
         super().__init__()
-        self.LLM_Models = LLM_Models
-        self.Embedding_Model = Embedding_Model
+
+        model_manager = ModelManager()
+
+        def get_language_models() -> dict:
+            llms = {}
+            model_list = model_manager.getOllamaModelList()
+            for model in model_list:
+                if (
+                    "completion" in model.capabilities
+                    and "embedding" not in model.capabilities
+                ):
+                    llms[model.name] = model.model
+
+            return llms
+
+        self.LLM_Models = get_language_models()
         self.current_chat = None  # <-- Add this line
-        self.default_search_mode = 0
+        self.rank_search: bool = False
         self.setWindowTitle("Knower")
         self.setMinimumSize(400, 550)
         self.showMaximized()
@@ -49,7 +64,7 @@ class APPWindow(QWidget):
         self.load_chat_history()
 
         def update_model_info(self, model):
-            model_name = LLM_Models.get(model, "❓ Unknown")
+            model_name = self.LLM_Models.get(model, "❓ Unknown")
             self.model_info.setText(model_name)
 
     def load_chat_history(self):
@@ -57,12 +72,12 @@ class APPWindow(QWidget):
         chats = get_conversations()
         for chat in chats:
             item = QListWidgetItem(chat["title"])
-            item.setData(Qt.UserRole, chat["id"])
+            item.setData(Qt.ItemDataRole.UserRole, chat["id"])
             self.history.addItem(item)
 
     def open_chat(self, item):
         self.clear_chat()
-        chat_id = item.data(Qt.UserRole)
+        chat_id = item.data(Qt.ItemDataRole.UserRole)
         self.current_chat = chat_id
         messages = get_messages(chat_id)
         for message in messages:
@@ -98,17 +113,6 @@ class APPWindow(QWidget):
 
             print(f"Original: {file_name}")
             print(f"Saved as: {destination}")
-
-    # Upload supportin material
-    def upload_attachment(self):
-        file_name, _ = QFileDialog.getOpenFileName(
-            self,
-            "Select Document",
-            "",
-            "Documents (*.pdf *.doc *.docx);;PDF Files (*.pdf);;Word Files (*.doc *.docx)",
-        )
-        if file_name:
-            print(file_name)
 
     def clear_chat(self):
         while self.chat_layout.count():
@@ -233,12 +237,7 @@ class APPWindow(QWidget):
         self.thread = QThread()
 
         # Create worker
-        self.worker = ChatWorker(
-            selected_model,
-            embedding_model=self.Embedding_Model["BGE-Base-en-v1.5-GGUF"],
-            query=query,
-            search_mode=self.default_search_mode,
-        )
+        self.worker = ChatWorker(query=query, rank_search=self.rank_search)
 
         # Move worker to thread
         self.worker.moveToThread(self.thread)
@@ -262,10 +261,10 @@ class APPWindow(QWidget):
 
     def change_search_mode(self, checked):
         if checked:
-            self.default_search_mode = 1
-            self.search_mode.setText("Ranked Search")
+            self.rank_search = True
+            self.search_mode.setText("Think Longer")
         else:
-            self.default_search_mode = 0
+            self.rank_search = False
             self.search_mode.setText("Normal Search")
 
     def build_ui(self):
@@ -288,7 +287,7 @@ class APPWindow(QWidget):
         sidebar_layout.setContentsMargins(15, 15, 15, 15)
 
         logo = QLabel("Knower")  # add the title here; top of the side bar
-        logo.setAlignment(Qt.AlignCenter)
+        logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logo.setStyleSheet(""" color:white; font-size:24px; font-weight:bold; """)
 
         self.new_chat_btn = QPushButton(
@@ -364,7 +363,7 @@ class APPWindow(QWidget):
         right_layout.setContentsMargins(25, 20, 25, 20)
 
         title = QLabel("How can I help you today?")
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("""
             color:#F8FAFC;
             font-size:28px;
@@ -372,7 +371,7 @@ class APPWindow(QWidget):
         """)
 
         self.chat_layout = QVBoxLayout()
-        self.chat_layout.setAlignment(Qt.AlignTop)
+        self.chat_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.chat_layout.setSpacing(10)
 
         chat_container = QWidget()
@@ -426,7 +425,7 @@ class APPWindow(QWidget):
         bottom = QHBoxLayout()
         self.model_box = QComboBox()
         added = False
-        for display_name, model_name in self.LLM_Models.items():
+        for display_name in self.LLM_Models:
             self.model_box.addItem(display_name)
             added = True
         if not added:
