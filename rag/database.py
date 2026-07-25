@@ -14,6 +14,12 @@ class VectorStore:
             persist_directory=self.persist_directory,
             embedding_function=embedding_function,
         )
+        self._rerankers = {}
+
+    def _get_reranker(self, model) -> CrossEncoder:
+        if model not in self._rerankers:
+            self._rerankers[model] = CrossEncoder(model)
+        return self._rerankers[model]
 
     @log("Store Documents in Vector Store")
     def store(self, document_list: list[Document]):
@@ -33,7 +39,7 @@ class VectorStore:
         number_of_fetched_results: int,
         model: str,
     ):
-        reranker = CrossEncoder(model)
+        reranker = self._get_reranker(model=model)
         retrieved_docs = self.search(search_query, number_of_fetched_results)
         pairs = [(search_query, doc.page_content) for doc in retrieved_docs]
         scores = reranker.predict(pairs)
