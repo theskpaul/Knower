@@ -13,10 +13,10 @@ class ChatWorker(QObject):
     finished = Signal(str)
     error = Signal(str)
 
-    def __init__(self, query: str, rank_search: bool):
+    def __init__(self, query: str, model_manager: ModelManager, rank_search: bool):
         super().__init__()
         self.query = query
-        self.model_manager = ModelManager()
+        self.model_manager = model_manager
         self.vector_store = VectorStore(
             embedding_function=self.model_manager.getEmbedder()
         )
