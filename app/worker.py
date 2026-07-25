@@ -32,13 +32,6 @@ class ChatWorker(QObject):
         context: str = "[Context]\n"
 
         if self.rank_search:
-            retrieved_docs = self.vector_store.search(
-                self.query, number_of_top_results=NUM_OF_TOP_CHUNKS
-            )
-
-            for chunk in retrieved_docs:
-                context += chunk.page_content + "\n"
-        else:
             retrieved_docs = self.vector_store.rerank(
                 search_query=self.query,
                 number_of_top_results=5,
@@ -49,6 +42,13 @@ class ChatWorker(QObject):
             for score, chunk in retrieved_docs:
                 if score > score_threshold:
                     context += f"({score}) : {chunk.page_content}" + "\n"
+        else:
+            retrieved_docs = self.vector_store.search(
+                self.query, number_of_top_results=NUM_OF_TOP_CHUNKS
+            )
+
+            for chunk in retrieved_docs:
+                context += chunk.page_content + "\n"
 
         return INSTRUCTION + context + "[Question]\n" + self.query
 
