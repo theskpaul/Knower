@@ -32,18 +32,21 @@ from app.chat import (
     get_messages,
     update_conversation_title,
 )
+from helper.file_manager import FileManager
+from rag.database import VectorStore
 from rag.model_manager import ModelManager
+from rag.text_splitter import TextSplitter as ts
 
 
 class APPWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        model_manager = ModelManager()
+        self.model_manager = ModelManager()
 
         def get_language_models() -> dict:
             llms = {}
-            model_list = model_manager.getOllamaModelList()
+            model_list = self.model_manager.getOllamaModelList()
             for model in model_list:
                 if (
                     "completion" in model.capabilities
@@ -86,33 +89,44 @@ class APPWindow(QWidget):
 
     # Upload data sheet to increase compalibility
     def upload_document(self):
-        file_name, _ = QFileDialog.getOpenFileName(
+        file_name_list, _ = QFileDialog.getOpenFileNames(
             self,
             "Select Document",
             "",
-            "Documents (*.pdf *.doc *.docx);;PDF Files (*.pdf);;Word Files (*.doc *.docx)",
+            "All Supported Files (*.txt *.pdf);;Text Files (*.txt);;PDF Files (*.pdf)",
         )
 
-        if file_name:
-            # Create the upload folder if it doesn't exist
-            upload_folder = PATH["sources"]
+        for file_name in file_name_list:
+            if file_name:
+                # Create the upload folder if it doesn't exist
+                upload_folder = PATH["sources"]
 
-            # Get original filename and extension
-            base = os.path.splitext(os.path.basename(file_name))[0]
-            ext = os.path.splitext(file_name)[1]
+                # Get original filename and extension
+                base = os.path.splitext(os.path.basename(file_name))[0]
+                ext = os.path.splitext(file_name)[1]
 
-            # Add timestamp to the filename
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            new_name = f"{base}_{timestamp}{ext}"
+                # Add timestamp to the filename
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                new_name = f"{base}_{timestamp}{ext}"
 
-            # Destination path
-            destination = upload_folder / new_name
+                # Destination path
+                destination = upload_folder / new_name
 
-            # Copy the file
-            shutil.copy2(file_name, destination)  # copy2 preserves metadata
+                # Copy the file
+                shutil.copy2(file_name, destination)  # copy2 preserves metadata
 
-            print(f"Original: {file_name}")
-            print(f"Saved as: {destination}")
+                print(f"Original: {file_name}")
+                print(f"Saved as: {destination}")
+
+    def process_documents(self):
+        fm = FileManager(PATH["sources"])
+        vector_store = VectorStore(embedding_function=self.model_manager.getEmbedder())
+        vector_store.chroma.reset_collection()
+
+        splits = ts(fm.get_file_records()).split_dataset(
+            self.model_manager.getEmbedder()
+        )
+        vector_store.store(splits)
 
     def clear_chat(self):
         while self.chat_layout.count():
@@ -319,8 +333,11 @@ class APPWindow(QWidget):
         """)
         self.history.setWordWrap(True)
 
-        upload_btn = QPushButton("📄 Upload Document")  # add a button that take dataset
+        upload_btn = QPushButton("Upload Documents")
         upload_btn.clicked.connect(self.upload_document)
+
+        process_btn = QPushButton("Process Documents")
+        process_btn.clicked.connect(self.process_documents)
 
         # Logo
         sidebar_layout.addWidget(logo)
@@ -351,6 +368,7 @@ class APPWindow(QWidget):
         sidebar_layout.addStretch()
 
         sidebar_layout.addWidget(upload_btn)
+        sidebar_layout.addWidget(process_btn)
 
         # =========== Right Side =============
         right = QFrame()
