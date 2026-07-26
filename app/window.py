@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QWidget
 
 from app.models import create_tables
 from default import PATH
+from helper.logger import log as l
 
 create_tables()
 
@@ -22,6 +23,7 @@ from helper.config import load_config
 from rag.model_manager import ModelManager, getOllamaModelList
 
 
+@l("Get list of language models")
 def get_language_models() -> dict:
     llms = {}
     model_list = getOllamaModelList()
@@ -50,6 +52,7 @@ model_manager = ModelManager(
 
 
 class APPWindow(QWidget):
+    @l("Load APPWindow __init__ function")
     def __init__(self):
         super().__init__()
 
@@ -95,6 +98,7 @@ class APPWindow(QWidget):
         for message in messages:
             self.add_message(message["role"], message["content"])
 
+    @l("Upload documents")
     def upload_document(self):
         from PySide6.QtWidgets import QFileDialog
 
@@ -122,6 +126,7 @@ class APPWindow(QWidget):
                 print(f"Original: {source}")
                 print(f"Saved as: {destination}")
 
+    @l("Process uploaded documents")
     def process_documents(self):
         from helper.file_manager import FileManager
         from rag.database import VectorStore
@@ -163,7 +168,7 @@ class APPWindow(QWidget):
 
         bubble = QLabel(message)
         bubble.setWordWrap(True)
-        bubble.setMaximumWidth(500)
+        bubble.setMaximumWidth(800)
 
         layout = QHBoxLayout()
 
@@ -174,6 +179,7 @@ class APPWindow(QWidget):
                     color:white;
                     border-radius:12px;
                     padding:10px;
+                    font-size: 18px;
                 }
             """)
 
@@ -187,6 +193,7 @@ class APPWindow(QWidget):
                     color:white;
                     border-radius:12px;
                     padding:10px;
+                    font-size: 18px;
                 }
             """)
 
@@ -234,6 +241,7 @@ class APPWindow(QWidget):
 
             row.deleteLater()
 
+    @l("Send message")
     def send_message(self):
         from PySide6.QtCore import QThread
 
@@ -306,6 +314,7 @@ class APPWindow(QWidget):
             self.rank_search = False
             self.search_mode.setText("Normal Search")
 
+    @l("Build a UI")
     def build_ui(self):
         from PySide6.QtWidgets import (
             QComboBox,
@@ -326,7 +335,7 @@ class APPWindow(QWidget):
 
         # =============== Sidebar creation  ==================
         sidebar = QFrame()
-        sidebar.setFixedWidth(300)
+        sidebar.setFixedWidth(320)
         sidebar.setStyleSheet(
             """ QFrame{ background:#161B22; border-right:1px solid #374151;} """
         )
@@ -391,6 +400,17 @@ class APPWindow(QWidget):
             }
         """)
 
+        # Document Label
+        document_label = QLabel("Manage Documents")
+        document_label.setStyleSheet("""
+            QLabel{
+                color: #B0B3B8;
+                font-size: 14px;
+                font-weight: bold;
+                padding-left: 5px;
+            }
+        """)
+
         sidebar_layout.addWidget(recent_label)
         sidebar_layout.addSpacing(8)
 
@@ -400,6 +420,7 @@ class APPWindow(QWidget):
         # Push Upload Button to Bottom
         sidebar_layout.addStretch()
 
+        sidebar_layout.addWidget(document_label)
         sidebar_layout.addWidget(upload_btn)
         sidebar_layout.addWidget(self.process_btn)
 
