@@ -10,6 +10,40 @@ TEMPERATURE: float = 0.7
 CROSS_RANKER_MODEL = {"ms-marco-MiniLM-L6-v2": "cross-encoder/ms-marco-MiniLM-L6-v2"}
 
 
+class DocumentProcessor(QObject):
+    finished = Signal(str)
+    error = Signal(str)
+
+    @l("Load Document Processor Class")
+    def __init__(self, model_manager: ModelManager):
+        super().__init__()
+
+        self.model_manager = model_manager
+        self.vector_store = VectorStore(
+            embedding_function=self.model_manager.getEmbedder()
+        )
+
+    @l("Start Document Processing")
+    @Slot()
+    def process(self):
+        from default import PATH
+        from helper.file_manager import FileManager as fm
+        from rag.text_splitter import TextSplitter as ts
+
+        try:
+            fm = fm(PATH["sources"])
+
+            self.vector_store.chroma.reset_collection()
+
+            splits = ts(fm.get_file_records()).split_dataset(
+                self.model_manager.getEmbedder()
+            )
+            self.vector_store.store(splits)
+            self.finished.emit("Document processing finished.")
+        except Exception as e:
+            self.finished.emit(str(e))
+
+
 class ChatWorker(QObject):
     finished = Signal(str)
     error = Signal(str)
