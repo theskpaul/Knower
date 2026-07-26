@@ -9,6 +9,7 @@ from helper.reader import read
 
 
 class FileManager:
+    @l("Load FileManager class")
     def __init__(self, dir_path):
         self.dir_path = dir_path
         self.file_list = os.scandir(self.dir_path)
