@@ -67,6 +67,7 @@ class APPWindow(QWidget):
 
         self.load_chat_history()
         self.update_model_info(local_lm_entry)
+        self._process_btn_original_style: str = str(self.process_btn.styleSheet)
 
     def update_model_info(self, model):
         model_name: str = self.LLM_Models.get(model, "")
@@ -98,6 +99,18 @@ class APPWindow(QWidget):
         for message in messages:
             self.add_message(message["role"], message["content"])
 
+    def active_mode(self):
+        self.process_btn.setText("Processing...")
+        self.process_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #f44336;
+                }
+            """)
+
+    def deactive_mode(self):
+        self.process_btn.setText("Process Documents")
+        self.process_btn.setStyleSheet(self._process_btn_original_style)
+
     @l("Upload documents")
     def upload_document(self):
         from PySide6.QtWidgets import QFileDialog
@@ -128,18 +141,26 @@ class APPWindow(QWidget):
 
     @l("Process uploaded documents")
     def process_documents(self):
-        from helper.file_manager import FileManager
-        from rag.database import VectorStore
-        from rag.text_splitter import TextSplitter
+        from PySide6.QtCore import QThread
 
-        fm = FileManager(PATH["sources"])
-        vector_store = VectorStore(embedding_function=model_manager.getEmbedder())
-        vector_store.chroma.reset_collection()
+        from app.worker import DocumentProcessor
 
-        splits = TextSplitter(fm.get_file_records()).split_dataset(
-            model_manager.getEmbedder()
-        )
-        vector_store.store(splits)
+        self.doc_thread = QThread()
+        self.doc_worker = DocumentProcessor(model_manager=model_manager)
+
+        self.doc_worker.moveToThread(self.doc_thread)
+
+        self.doc_thread.started.connect(self.active_mode)
+        self.doc_thread.started.connect(self.doc_worker.process)
+        self.doc_worker.finished.connect(self.deactive_mode)
+        self.doc_worker.error.connect(self.deactive_mode)
+
+        self.doc_worker.finished.connect(self.doc_thread.quit)
+        self.doc_worker.finished.connect(self.doc_worker.deleteLater)
+
+        self.doc_thread.finished.connect(self.doc_thread.deleteLater)
+
+        self.doc_thread.start()
 
     def clear_chat(self):
         while self.chat_layout.count():
@@ -279,28 +300,28 @@ class APPWindow(QWidget):
         self.add_message("ai", "Thinking...")
 
         # Create thread
-        self.thread = QThread()
+        self.chat_thread = QThread()
 
         model_manager.large_language_model = selected_model
-        self.worker = ChatWorker(
+        self.chat_worker = ChatWorker(
             query=query, model_manager=model_manager, rank_search=self.rank_search
         )
 
         # Move worker to thread
-        self.worker.moveToThread(self.thread)
+        self.chat_worker.moveToThread(self.chat_thread)
 
         # Connect signals
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.show_reply)
-        self.worker.error.connect(self.show_error)
+        self.chat_thread.started.connect(self.chat_worker.run)
+        self.chat_worker.finished.connect(self.show_reply)
+        self.chat_worker.error.connect(self.show_error)
 
         # Clean up
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
+        self.chat_worker.finished.connect(self.chat_thread.quit)
+        self.chat_worker.finished.connect(self.chat_worker.deleteLater)
+        self.chat_thread.finished.connect(self.chat_thread.deleteLater)
 
         # Start
-        self.thread.start()
+        self.chat_thread.start()
 
     def new_chat(self):
         self.clear_chat()
