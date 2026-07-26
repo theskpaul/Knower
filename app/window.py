@@ -179,7 +179,7 @@ class APPWindow(QWidget):
                     color:white;
                     border-radius:12px;
                     padding:10px;
-                    font-size: 18px;
+                    font-size: 16px;
                 }
             """)
 
@@ -193,7 +193,7 @@ class APPWindow(QWidget):
                     color:white;
                     border-radius:12px;
                     padding:10px;
-                    font-size: 18px;
+                    font-size: 16px;
                 }
             """)
 
