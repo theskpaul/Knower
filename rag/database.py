@@ -3,10 +3,11 @@ from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
 from default import PATH
-from helper.logger import log
+from helper.logger import log as l
 
 
 class VectorStore:
+    @l("Load VectorStore class __init__ funciton")
     def __init__(self, embedding_function):
         self.persist_directory = PATH["vectordb"]
         self.embedding_function = embedding_function
@@ -21,17 +22,17 @@ class VectorStore:
             self._rerankers[model] = CrossEncoder(model)
         return self._rerankers[model]
 
-    @log("Store Documents in Vector Store")
+    @l("Store Documents in Vector Store")
     def store(self, document_list: list[Document]):
         self.chroma.add_documents(document_list)
 
-    @log("Search in Vector Store")
+    @l("Search in Vector Store")
     def search(self, search_query: str, number_of_top_results: int) -> list[Document]:
         return self.chroma.similarity_search(
             query=search_query, k=number_of_top_results
         )
 
-    @log("Reranking Search Results")
+    @l("Reranking Search Results")
     def rerank(
         self,
         search_query: str,

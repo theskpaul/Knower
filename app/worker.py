@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, Signal, Slot
 
+from helper.logger import log as l
 from rag.database import VectorStore
 from rag.model_manager import ModelManager
 
@@ -13,6 +14,7 @@ class ChatWorker(QObject):
     finished = Signal(str)
     error = Signal(str)
 
+    @l("Load ChatWorker class")
     def __init__(self, query: str, model_manager: ModelManager, rank_search: bool):
         super().__init__()
         self.query = query
@@ -22,6 +24,7 @@ class ChatWorker(QObject):
         )
         self.rank_search = rank_search
 
+    @l("Generate the Prompt")
     def prompt(self, score_threshold=0.0):
         INSTRUCTION: str = """[Instruction]
                     You have access to a tool that retrieves context from the dataset. Use the tool to help answer user queries.
@@ -52,6 +55,7 @@ class ChatWorker(QObject):
 
         return INSTRUCTION + context + "[Question]\n" + self.query
 
+    @l("Start ChatWorker")
     @Slot()
     def run(self):
         response = self.model_manager.ask(input=self.prompt(), temperature=TEMPERATURE)

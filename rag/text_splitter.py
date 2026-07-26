@@ -4,14 +4,14 @@ from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
 from helper.file_record import Record
-from helper.logger import log
+from helper.logger import log as l
 
 
 class TextSplitter:
     def __init__(self, datasets: list[Record]):
         self.datasets = datasets
 
-    @log("Split Dataset")
+    @l("Split Dataset")
     def split_dataset(
         self,
         embedding_function,

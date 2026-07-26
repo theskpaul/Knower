@@ -1,10 +1,12 @@
 import json
 
 from default import PATH
+from helper.logger import log as l
 
 file_name = PATH["temp_config"] / "settings.json"
 
 
+@l("Load Config file")
 def load_config():
     try:
         with open(file_name, "r", encoding="utf-8") as f:
@@ -15,6 +17,7 @@ def load_config():
     return result
 
 
+@l("Add a new entry to the config")
 def add_entry(key, value):
     result = load_config()
     if result:
