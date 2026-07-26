@@ -1,3 +1,5 @@
+#!/usr/bin/env /home/var0/Projects/Knower/.venv/bin/python3
+
 from default import check_and_make
 
 check_and_make()
