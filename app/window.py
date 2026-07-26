@@ -314,6 +314,24 @@ class APPWindow(QWidget):
             self.rank_search = False
             self.search_mode.setText("Normal Search")
 
+    def show_uploaded_docs(self):
+        import os
+
+        from PySide6.QtWidgets import QDialog, QListWidget, QVBoxLayout
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Uploaded Documents")
+        dialog.resize(400, 300)
+
+        layout = QVBoxLayout(dialog)
+        doc_list = QListWidget()
+
+        for filename in os.listdir(PATH["sources"]):
+            doc_list.addItem(filename)
+
+        layout.addWidget(doc_list)
+        dialog.exec()
+
     @l("Build a UI")
     def build_ui(self):
         from PySide6.QtWidgets import (
@@ -375,6 +393,9 @@ class APPWindow(QWidget):
         """)
         self.history.setWordWrap(True)
 
+        list_documents_btn = QPushButton("Documents")
+        list_documents_btn.clicked.connect(self.show_uploaded_docs)
+
         upload_btn = QPushButton("Upload Documents")
         upload_btn.clicked.connect(self.upload_document)
 
@@ -421,6 +442,7 @@ class APPWindow(QWidget):
         sidebar_layout.addStretch()
 
         sidebar_layout.addWidget(document_label)
+        sidebar_layout.addWidget(list_documents_btn)
         sidebar_layout.addWidget(upload_btn)
         sidebar_layout.addWidget(self.process_btn)
 
