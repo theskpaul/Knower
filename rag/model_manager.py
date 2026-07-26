@@ -1,11 +1,23 @@
-import requests
+from dataclasses import dataclass, field
+
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
-from helper.file_record import Model
-from helper.logger import log
+from helper.logger import log as l
 
 
+@dataclass
+class Model:
+    name: str
+    model: str
+    size: int
+    capabilities: list
+    details: dict = field(default_factory=dict)
+
+
+@l("Get ollama model list")
 def getOllamaModelList():
+    import requests
+
     OLLAMA_URL = "http://localhost:11434"
     try:
         req = requests.get(OLLAMA_URL + "/api/tags")
@@ -38,10 +50,11 @@ class ModelManager:
         self.large_language_model = language_model
         self.embedding_model = embedding_model
 
+    @l("Get embedding function")
     def getEmbedder(self):
         return OllamaEmbeddings(model=self.embedding_model)
 
-    @log("Give a prompt to the LLM")
+    @l("Give a prompt to the LLM")
     def ask(self, input: str, temperature: float, num_ctx: int = 4096):
         return OllamaLLM(
             model=self.large_language_model, temperature=temperature, num_ctx=num_ctx
