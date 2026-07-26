@@ -9,6 +9,7 @@ PATH = {
     "sources": BASE_DIR / "data" / "sources",
     "vectordb": BASE_DIR / "data" / "vectordb",
     "log": BASE_DIR / "data" / "log",
+    "cross_encoder": BASE_DIR / "Models" / "cross_encoder",
 }
 
 DEFAULT_CONFIG = {

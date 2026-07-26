@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, Signal, Slot
 
+from default import PATH
 from helper.logger import log as l
 from rag.database import VectorStore
 from rag.model_manager import ModelManager
@@ -7,7 +8,9 @@ from rag.model_manager import ModelManager
 NUM_OF_TOP_CHUNKS: int = 2
 TEMPERATURE: float = 0.7
 
-CROSS_RANKER_MODEL = {"ms-marco-MiniLM-L6-v2": "cross-encoder/ms-marco-MiniLM-L6-v2"}
+CROSS_RANKER_MODEL = {
+    "ms-marco-MiniLM-L6-v2": str(PATH["cross_encoder"] / "ms-marco-MiniLM-L6-v2")
+}
 
 
 class DocumentProcessor(QObject):

@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# Directories
+Models/cross_encoder
+
 # Temporary files
 data/
 
