@@ -1,7 +1,7 @@
 import json
 
 from default import PATH
-from helper.logger import log as l
+from logger import log as l
 
 file_name = PATH["temp_config"] / "settings.json"
 

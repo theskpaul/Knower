@@ -1,6 +1,6 @@
 import pymupdf4llm
 
-from helper.logger import log as l
+from logger import log as l
 
 
 @l("Read PDF")

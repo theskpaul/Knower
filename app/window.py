@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget
 
 from app.models import create_tables
 from default import PATH
-from helper.logger import log as l
+from logger import log as l
 
 create_tables()
 

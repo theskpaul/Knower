@@ -4,8 +4,8 @@ import os
 import puremagic as magic
 
 from helper.file_record import Record
-from helper.logger import log as l
 from helper.reader import read
+from logger import log as l
 
 
 class FileManager:

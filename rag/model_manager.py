@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
-from helper.logger import log as l
+from logger import log as l
 
 
 @dataclass

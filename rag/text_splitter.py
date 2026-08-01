@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
 from helper.file_record import Record
-from helper.logger import log as l
+from logger import log as l
 
 
 class TextSplitter:

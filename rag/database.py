@@ -3,7 +3,7 @@ from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
 from default import PATH
-from helper.logger import log as l
+from logger import log as l
 
 
 class VectorStore:

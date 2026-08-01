@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Slot
 
 from default import PATH
-from helper.logger import log as l
+from logger import log as l
 from rag.database import VectorStore
 from rag.model_manager import ModelManager
 
