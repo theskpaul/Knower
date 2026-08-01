@@ -18,8 +18,8 @@ from app.chat import (
     get_messages,
     update_conversation_title,
 )
+from core.helper.config import load_config
 from default import DEFAULT_CONFIG
-from helper.config import load_config
 from rag.model_manager import ModelManager, getOllamaModelList
 
 
@@ -267,7 +267,7 @@ class APPWindow(QWidget):
         from PySide6.QtCore import QThread
 
         from app.worker import ChatWorker
-        from helper.config import add_entry
+        from core.helper.config import add_entry
 
         query = self.input_box.toPlainText().strip()
 

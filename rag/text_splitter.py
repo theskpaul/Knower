@@ -3,7 +3,7 @@ import hashlib
 from langchain_core.documents import Document
 from langchain_experimental.text_splitter import SemanticChunker
 
-from helper.file_record import Record
+from core.helper.file_record import Record
 from logger import log as l
 
 

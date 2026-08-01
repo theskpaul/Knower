@@ -3,8 +3,8 @@ import os
 
 import puremagic as magic
 
-from helper.file_record import Record
-from helper.reader import read
+from core.helper.file_record import Record
+from core.helper.reader import read
 from logger import log as l
 
 

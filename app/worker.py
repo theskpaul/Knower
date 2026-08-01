@@ -29,8 +29,8 @@ class DocumentProcessor(QObject):
     @l("Start Document Processing")
     @Slot()
     def process(self):
+        from core.helper.file_manager import FileManager as fm
         from default import PATH
-        from helper.file_manager import FileManager as fm
         from rag.text_splitter import TextSplitter as ts
 
         try:
