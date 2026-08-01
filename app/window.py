@@ -19,8 +19,8 @@ from app.chat import (
     update_conversation_title,
 )
 from core.helper.config import load_config
+from core.pipeline.model_manager import ModelManager, getOllamaModelList
 from default import DEFAULT_CONFIG
-from rag.model_manager import ModelManager, getOllamaModelList
 
 
 @l("Get list of language models")

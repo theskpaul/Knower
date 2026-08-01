@@ -1,9 +1,9 @@
 from PySide6.QtCore import QObject, Signal, Slot
 
+from core.pipeline.database import VectorStore
+from core.pipeline.model_manager import ModelManager
 from default import PATH
 from logger import log as l
-from rag.database import VectorStore
-from rag.model_manager import ModelManager
 
 NUM_OF_TOP_CHUNKS: int = 2
 TEMPERATURE: float = 0.7
@@ -30,8 +30,8 @@ class DocumentProcessor(QObject):
     @Slot()
     def process(self):
         from core.helper.file_manager import FileManager as fm
+        from core.pipeline.text_splitter import TextSplitter as ts
         from default import PATH
-        from rag.text_splitter import TextSplitter as ts
 
         try:
             fm = fm(PATH["sources"])
