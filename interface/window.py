@@ -5,22 +5,22 @@ import shutil
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 
-from app.models import create_tables
 from default import PATH
+from interface.models import create_tables
 from logger import log as l
 
 create_tables()
 
-from app.chat import (
+from core.helper.config import load_config
+from core.pipeline.model_manager import ModelManager, getOllamaModelList
+from default import DEFAULT_CONFIG
+from interface.chat import (
     add_message,
     create_conversation,
     get_conversations,
     get_messages,
     update_conversation_title,
 )
-from core.helper.config import load_config
-from core.pipeline.model_manager import ModelManager, getOllamaModelList
-from default import DEFAULT_CONFIG
 
 
 @l("Get list of language models")
@@ -143,7 +143,7 @@ class APPWindow(QWidget):
     def process_documents(self):
         from PySide6.QtCore import QThread
 
-        from app.worker import DocumentProcessor
+        from interface.worker import DocumentProcessor
 
         self.doc_thread = QThread()
         self.doc_worker = DocumentProcessor(model_manager=model_manager)
@@ -266,8 +266,8 @@ class APPWindow(QWidget):
     def send_message(self):
         from PySide6.QtCore import QThread
 
-        from app.worker import ChatWorker
         from core.helper.config import add_entry
+        from interface.worker import ChatWorker
 
         query = self.input_box.toPlainText().strip()
 

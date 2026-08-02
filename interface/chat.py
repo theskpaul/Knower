@@ -1,4 +1,4 @@
-from app.db import get_connection
+from interface.db import get_connection
 
 
 def create_conversation(title):
