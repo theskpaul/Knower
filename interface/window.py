@@ -418,6 +418,7 @@ class APPWindow(QWidget):
             }
         """)
         self.history.setWordWrap(True)
+        self.history.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         list_documents_btn = QPushButton("Documents")
         list_documents_btn.clicked.connect(self.show_uploaded_docs)
