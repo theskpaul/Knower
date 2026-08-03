@@ -3,7 +3,7 @@ import os
 import shutil
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QMainWindow, QWidget
 
 from default import PATH
 from interface.chat_db import create_tables
@@ -51,7 +51,7 @@ model_manager = ModelManager(
 )
 
 
-class APPWindow(QWidget):
+class APPWindow(QMainWindow):
     @l("Load APPWindow __init__ function")
     def __init__(self):
         super().__init__()
@@ -374,7 +374,8 @@ class APPWindow(QWidget):
         )
 
         # ===== Main Layout =====
-        main_layout = QHBoxLayout(self)
+        central = QWidget()
+        main_layout = QHBoxLayout(central)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
@@ -594,3 +595,7 @@ class APPWindow(QWidget):
         # ==================================================
         main_layout.addWidget(sidebar)
         main_layout.addWidget(right)
+
+        self.setCentralWidget(central)
+        self.setMinimumWidth(1200)
+        self.setMinimumHeight(800)
