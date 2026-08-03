@@ -1,4 +1,4 @@
-from .db import get_connection
+from .chat_db import get_connection
 
 
 def create_tables():

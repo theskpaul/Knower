@@ -1,4 +1,4 @@
-from interface.db import get_connection
+from interface.chat_db import get_connection
 
 
 def create_conversation(title):
