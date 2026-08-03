@@ -363,6 +363,7 @@ class APPWindow(QWidget):
             QListWidget,
             QPushButton,
             QScrollArea,
+            QSizePolicy,
             QTextEdit,
             QVBoxLayout,
         )
@@ -392,6 +393,10 @@ class APPWindow(QWidget):
         self.new_chat_btn.clicked.connect(self.new_chat)
         self.history = QListWidget()  # crearte the history section
         self.history.itemClicked.connect(self.open_chat)
+        self.history.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        self.setContentsMargins(0, 0, 0, 0)
         self.history.setStyleSheet("""
             QListWidget {
                 background-color: #2B2B2B;
@@ -458,9 +463,6 @@ class APPWindow(QWidget):
 
         # Chat History
         sidebar_layout.addWidget(self.history)
-
-        # Push Upload Button to Bottom
-        sidebar_layout.addStretch()
 
         sidebar_layout.addWidget(document_label)
         sidebar_layout.addWidget(list_documents_btn)
