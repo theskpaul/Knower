@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 
 from default import PATH
-from interface.models import create_tables
+from interface.chat_db import create_tables
 from logger import log as l
 
 create_tables()
