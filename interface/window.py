@@ -64,10 +64,41 @@ class APPWindow(QMainWindow):
         self.showMaximized()
 
         self.build_ui()
+        self.add_menubar()
 
         self.load_chat_history()
         self.update_model_info(local_lm_entry)
         self._process_btn_original_style: str = str(self.process_btn.styleSheet)
+
+    def add_menubar(self):
+        from PySide6.QtGui import QAction
+
+        menu = self.menuBar()
+
+        udocs = QAction("Upload Documents", self)
+        udocs.triggered.connect(self.upload_document)
+
+        pdocs = QAction("Process Documents", self)
+        pdocs.triggered.connect(self.process_documents)
+
+        ldocs = QAction("List Documents", self)
+        ldocs.triggered.connect(self.show_uploaded_docs)
+
+        self.quit_app = QAction("Exit", self)
+
+        file_menu = menu.addMenu("File")
+        file_menu.addAction(udocs)
+        file_menu.addAction(self.quit_app)
+
+        doc_menu = menu.addMenu("Document")
+        doc_menu.addAction(pdocs)
+        doc_menu.addAction(ldocs)
+
+        window_menu = menu.addMenu("Window")
+
+        menu.addMenu(file_menu)
+        menu.addMenu(doc_menu)
+        menu.addMenu(window_menu)
 
     def update_model_info(self, model):
         model_name: str = self.LLM_Models.get(model, "")
