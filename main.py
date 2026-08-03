@@ -14,6 +14,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = APPWindow()
+    window.quit_app.setShortcut("Ctrl+Q")
+    window.quit_app.triggered.connect(app.quit)
     window.show()
 
     sys.exit(app.exec())
