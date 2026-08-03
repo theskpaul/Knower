@@ -163,20 +163,24 @@ class APPWindow(QWidget):
         self.doc_thread.start()
 
     def clear_chat(self):
+
         while self.chat_layout.count():
             item = self.chat_layout.takeAt(0)
 
             # Remove widget
-            if item.widget():
-                item.widget().deleteLater()
+
+            widget = item.widget() if item is not None else None
+            row = item.layout() if item is not None else None
+            if widget:
+                widget.deleteLater()
 
             # Remove nested layout (your QHBoxLayout)
-            elif item.layout():
-                row = item.layout()
+            elif row:
                 while row.count():
                     child = row.takeAt(0)
-                    if child.widget():
-                        child.widget().deleteLater()
+                    child_widget = child.widget() if child is not None else None
+                    if child_widget:
+                        child_widget.deleteLater()
                 row.deleteLater()
             # Clear the input box
         self.input_box.clear()
@@ -227,12 +231,13 @@ class APPWindow(QWidget):
         if self.chat_layout.count():
             item = self.chat_layout.takeAt(self.chat_layout.count() - 1)
 
-            if item.layout():
-                row = item.layout()
+            row = item.layout() if item is not None else None
+            if row:
                 while row.count():
                     child = row.takeAt(0)
-                    if child.widget():
-                        child.widget().deleteLater()
+                    child_widget = child.widget() if child is not None else None
+                    if child_widget:
+                        child_widget.deleteLater()
                 row.deleteLater()
 
     def show_reply(self, reply):
@@ -252,13 +257,13 @@ class APPWindow(QWidget):
 
         item = self.chat_layout.takeAt(self.chat_layout.count() - 1)
 
-        if item.layout():
-            row = item.layout()
-
+        row = item.layout() if item is not None else None
+        if row:
             while row.count():
                 child = row.takeAt(0)
-                if child.widget():
-                    child.widget().deleteLater()
+                child_widget = child.widget() if child is not None else None
+                if child_widget:
+                    child_widget.deleteLater()
 
             row.deleteLater()
 
